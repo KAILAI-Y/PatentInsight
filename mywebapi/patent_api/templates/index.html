@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Search Patents</title>
+  </head>
+  <body>
+    <h1>Search Patents</h1>
+    <form method="get" action="{% url 'search' %}">
+      <input type="text" name="q" placeholder="Enter search terms" />
+      <input type="submit" value="Search" />
+    </form>
+  </body>
+</html>

@@ -1,17 +1,17 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from .models import Patent
 
 
-# Create your views here.
-# def all_user(request):
-#     return HttpResponse("Returing")
+def index(request):
+    return render(request, "index.html")
 
 
-from django.http import JsonResponse
-from .models import Patent  # 导入你的模型
+def search(request):
+    query = request.GET.get("q", "")  # 获取搜索词
+    if query:
+        patents = Patent.objects.filter(title__icontains=query)  # 在标题中搜索
+    else:
+        patents = Patent.objects.none()  # 如果没有查询词，则不返回任何结果
 
-
-def all_user(request):
-    data = Patent.objects.all()  # 从数据库获取数据
-    data_list = list(data.values())  # 将查询集转换为字典列表
-    return JsonResponse(data_list, safe=False)  # 返回 JSON 响应
+    return render(request, "results.html", {"patents": patents})

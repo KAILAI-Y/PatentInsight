@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Search Results</title>
+  </head>
+  <body>
+    <h1>Search Results</h1>
+    {% if patents %}
+    <ul>
+      {% for patent in patents %}
+      <li>{{ patent.title }} ({{ patent.year }})</li>
+      {% empty %}
+      <li>No patents found.</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No patents found.</p>
+    {% endif %}
+  </body>
+</html>
