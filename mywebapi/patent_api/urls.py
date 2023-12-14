@@ -20,5 +20,11 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
-    path("search/", views.search, name="search"),
+    path("search/", views.index, name="search"),
+    path("results/", views.patent_list, name="patent_list"),
+    path(
+        "graph/",
+        views.patent_year_distribution,
+        name="patent_year_distribution",
+    ),
 ]

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Patent Year Distribution</title>
+    <!-- 引入 ECharts 文件 -->
+    {% load static %}
+    <script src="{% static 'echarts.js' %}"></script>
+  </head>
+  <body>
+    <h1>Graphs</h1>
+    <div id="distribution_line" style="width: 600px; height: 400px"></div>
+    <div id="distribution_bar" style="width: 600px; height: 400px"></div>
+    <script>
+      var lineChart = echarts.init(document.getElementById('distribution_line'));
+      var barChart = echarts.init(document.getElementById('distribution_bar'));
+
+      var lineOption = {
+          // ECharts 配置项
+          xAxis: {
+              type: 'category',
+              data: {{ years|safe }}
+          },
+          yAxis: {
+              type: 'value'
+          },
+          series: [{
+              data: {{ counts|safe }},
+              type: 'line'  // 或 'bar' 对于柱状图
+          }]
+      };
+      lineChart.setOption(lineOption);
+
+      var barOption = {
+          // ECharts 配置项
+          xAxis: {
+              type: 'category',
+              data: {{ years|safe }}
+          },
+          yAxis: {
+              type: 'value'
+          },
+          series: [{
+              data: {{ counts|safe }},
+              type: 'bar'
+          }]
+      };
+      barChart.setOption(barOption);
+    </script>
+  </body>
+</html>
