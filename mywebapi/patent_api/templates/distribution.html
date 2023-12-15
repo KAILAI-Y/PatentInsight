@@ -10,11 +10,14 @@
     <h1>Graphs</h1>
     <div id="distribution_line" style="width: 600px; height: 400px"></div>
     <div id="distribution_bar" style="width: 600px; height: 400px"></div>
-    <script>
-      var lineChart = echarts.init(document.getElementById('distribution_line'));
-      var barChart = echarts.init(document.getElementById('distribution_bar'));
+    <div id="innovation_bar" style="width: 600px; height: 400px"></div>
 
-      var lineOption = {
+    <script>
+      var dist_line = echarts.init(document.getElementById('distribution_line'));
+      var dist_bar = echarts.init(document.getElementById('distribution_bar'));
+      var inno_bar = echarts.init(document.getElementById('innovation_bar'));
+
+      var dist_lineOption = {
           // ECharts 配置项
           xAxis: {
               type: 'category',
@@ -28,9 +31,9 @@
               type: 'line'  // 或 'bar' 对于柱状图
           }]
       };
-      lineChart.setOption(lineOption);
+      dist_line.setOption(dist_lineOption);
 
-      var barOption = {
+      var dist_barOption = {
           // ECharts 配置项
           xAxis: {
               type: 'category',
@@ -44,7 +47,22 @@
               type: 'bar'
           }]
       };
-      barChart.setOption(barOption);
+      dist_bar.setOption(dist_barOption);
+
+      {% comment %} var inno_barOption = {
+          xAxis: {
+              type: 'category',
+              data: {{ provinces|safe }}
+          },
+          yAxis: {
+              type: 'value'
+          },
+          series: [{
+              data: {{ province_counts|safe }},
+              type: 'bar'
+          }]
+        };
+      inno_bar.setOption(inno_barOption); {% endcomment %}
     </script>
   </body>
 </html>

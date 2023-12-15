@@ -37,4 +37,20 @@ def patent_year_distribution(request):
 
     # 将数据传递到模板
     context = {"years": years, "counts": counts}
-    return render(request, "graph.html", context)
+    return render(request, "distribution.html", context)
+
+
+def province_innovation(request):
+    query = request.GET.get("q", "")
+    patents = search(query)
+
+    province_counts = (
+        patents.values("province").annotate(count=Count("id")).order_by("-count")
+    )
+    print(province_counts)
+
+    provinces = [item["province"] for item in province_counts]
+    province_counts = [item["count"] for item in province_counts]
+
+    context = {"provinces": provinces, "province_counts": province_counts}
+    return render(request, "innovation.html", context)

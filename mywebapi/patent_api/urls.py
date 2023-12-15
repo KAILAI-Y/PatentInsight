@@ -23,8 +23,13 @@ urlpatterns = [
     path("search/", views.index, name="search"),
     path("results/", views.patent_list, name="patent_list"),
     path(
-        "graph/",
+        "distribution/",
         views.patent_year_distribution,
         name="patent_year_distribution",
+    ),
+    path(
+        "innovation/",
+        views.province_innovation,
+        name="province_innovation",
     ),
 ]

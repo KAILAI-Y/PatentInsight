@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Patent Year Distribution</title>
+    <!-- 引入 ECharts 文件 -->
+    {% load static %}
+    <script src="{% static 'echarts.js' %}"></script>
+    <script src="{% static 'maps/china.json' %}"></script>
+  </head>
+  <body>
+    <h1>Graphs</h1>
+    <div id="innovation_bar" style="width: 600px; height: 400px"></div>
+    <div id="innovation_map" style="width: 600px; height: 400px"></div>
+
+    <script>
+        var inno_bar = echarts.init(document.getElementById('innovation_bar'));
+        var innovation_map = echarts.init(document.getElementById('innovation_map'));
+        var inno_barOption = {
+            xAxis: {
+                type: 'category',
+                data: {{ provinces|safe }}
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                data: {{ province_counts|safe }},
+                type: 'bar'
+            }]
+          };
+        inno_bar.setOption(inno_barOption);
+
+        echarts.registerMap('china', {geoJSON});
+        var inno_mapOption ={
+          series: [
+          {
+              type: 'map',
+              map: 'china'  // 使用注册的地图
+              // 其他配置项
+          }
+      ]
+        };
+        inno_map.setOption(inno_mapOption);
+    </script>
+  </body>
+</html>
