@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.conf import settings
 from django.shortcuts import render
 from django.db.models import Count
 from django.db import models
@@ -50,7 +50,7 @@ def province_innovation(request):
     print(province_counts)
 
     provinces = [item["province"] for item in province_counts]
-    province_counts = [item["count"] for item in province_counts]
+    province_count = [item["count"] for item in province_counts]
 
-    context = {"provinces": provinces, "province_counts": province_counts}
+    context = {"provinces": provinces, "province_count": province_count, 'baidu_map_ak': settings.BAIDU_MAP_AK}
     return render(request, "innovation.html", context)
