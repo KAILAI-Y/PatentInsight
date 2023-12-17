@@ -25,7 +25,14 @@ def patent_list(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     print(query)
-    return render(request, "result.html", {"page_obj": page_obj})
+    return render(
+        request,
+        "result.html",
+        {
+            "page_obj": page_obj,
+            "total_count": paginator.count,
+        },
+    )
 
 
 def patent_year_distribution(request):
