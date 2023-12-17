@@ -32,4 +32,9 @@ urlpatterns = [
         views.province_innovation,
         name="province_innovation",
     ),
+    path(
+        "network/",
+        views.network_view,
+        name="network_view",
+    ),
 ]

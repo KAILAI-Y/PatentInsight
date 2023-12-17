@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Patent Year Distribution</title>
+    <!-- 引入 ECharts 文件 -->
+    {% load static %}
+    <script src="{% static 'echarts.js' %}"></script>
+  </head>
+  <body>
+    <h1>Collaboration Network Visualization</h1>
+    <div id="networkChart" style="width: 800px; height: 600px"></div>
+
+    <script>
+      var myChart = echarts.init(document.getElementById('networkChart'));
+
+      var option = {
+          series: [{
+              type: 'graph',
+              layout: 'force',
+              data: {{ nodes_data|safe }},
+              links: {{ links_data|safe }},
+              roam: true,
+              label: {
+                  show: true
+              },
+              force: {
+                  repulsion: 500,
+                  edgeLength: 100
+              }
+          }]
+      };
+
+      myChart.setOption(option);
+    </script>
+  </body>
+</html>

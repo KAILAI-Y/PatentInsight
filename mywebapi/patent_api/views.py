@@ -1,3 +1,4 @@
+from collections import defaultdict
 from django.conf import settings
 from django.shortcuts import render
 from django.db.models import Count
@@ -52,5 +53,42 @@ def province_innovation(request):
     provinces = [item["province"] for item in province_counts]
     province_count = [item["count"] for item in province_counts]
 
-    context = {"provinces": provinces, "province_count": province_count, 'baidu_map_ak': settings.BAIDU_MAP_AK}
+    context = {
+        "provinces": provinces,
+        "province_count": province_count,
+        "baidu_map_ak": settings.BAIDU_MAP_AK,
+    }
     return render(request, "innovation.html", context)
+
+
+def network_view(request):
+    query = request.GET.get("q", "")
+    patents = search(query)
+
+    # 提取网络数据
+    nodes = set()
+    links = defaultdict(int)
+
+    for patent in patents:
+        entities = patent.apos.split(";")
+        for entity in entities:
+            nodes.add(entity)
+        for i in range(len(entities)):
+            for j in range(i + 1, len(entities)):
+                links[(entities[i], entities[j])] += 1
+
+    nodes_data = [{"name": node} for node in nodes]
+    links_data = [
+        {"source": source, "target": target, "value": links[(source, target)]}
+        for source, target in links
+    ]
+
+    # 将数据传递到模板
+    return render(
+        request,
+        "network.html",
+        {
+            "nodes_data": nodes_data,
+            "links_data": links_data,
+        },
+    )
