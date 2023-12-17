@@ -20,7 +20,7 @@ def search(query):
 def patent_list(request):
     query = request.GET.get("q", "")
     patents = search(query)
-    return render(request, "results.html", {"patents": patents})
+    return render(request, "result.html", {"patents": patents})
 
 
 def patent_year_distribution(request):

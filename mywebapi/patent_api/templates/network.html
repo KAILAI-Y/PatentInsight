@@ -2,13 +2,43 @@
 <html>
   <head>
     <title>Patent Year Distribution</title>
-    <!-- 引入 ECharts 文件 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     {% load static %}
     <script src="{% static 'echarts.js' %}"></script>
   </head>
   <body>
-    <h1>Collaboration Network Visualization</h1>
-    <div id="networkChart" style="width: 800px; height: 600px"></div>
+    <div class="container mt-3">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link" href="/result?q={{ request.GET.q }}">专利集合</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/distribution?q={{ request.GET.q }}"
+            >专利的年度分布</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/innovation?q={{ request.GET.q }}"
+            >领域创新主体计量/分布</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="#graph_network"
+            >领域合作网络及测度</a
+          >
+        </li>
+      </ul>
+
+      <div class="tab-content">
+        <div id="graph_network" class="container tab-pane active">
+          <br />
+          <div id="networkChart" style="width: 800px; height: 600px"></div>
+        </div>
+      </div>
+    </div>
 
     <script>
       var myChart = echarts.init(document.getElementById('networkChart'));
@@ -32,5 +62,6 @@
 
       myChart.setOption(option);
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

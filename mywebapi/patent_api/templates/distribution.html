@@ -2,23 +2,49 @@
 <html>
   <head>
     <title>Patent Year Distribution</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <!-- 引入 ECharts 文件 -->
     {% load static %}
     <script src="{% static 'echarts.js' %}"></script>
   </head>
   <body>
-    <h1>Graphs</h1>
-    <div id="distribution_line" style="width: 600px; height: 400px"></div>
-    <div id="distribution_bar" style="width: 600px; height: 400px"></div>
-    <div id="innovation_bar" style="width: 600px; height: 400px"></div>
+    <div class="container mt-3">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link" href="/result?q={{ request.GET.q }}">专利集合</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="">专利的年度分布</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/innovation?q={{ request.GET.q }}"
+            >领域创新主体计量/分布</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/network?q={{ request.GET.q }}"
+            >领域合作网络及测度</a
+          >
+        </li>
+      </ul>
+
+      <div class="tab-content">
+        <div id="graph_dist" class="container tab-pane active">
+          <br />
+          <div id="distribution_line" style="width: 600px; height: 400px"></div>
+          <div id="distribution_bar" style="width: 600px; height: 400px"></div>
+        </div>
+      </div>
+    </div>
 
     <script>
       var dist_line = echarts.init(document.getElementById('distribution_line'));
       var dist_bar = echarts.init(document.getElementById('distribution_bar'));
-      var inno_bar = echarts.init(document.getElementById('innovation_bar'));
 
       var dist_lineOption = {
-          // ECharts 配置项
           xAxis: {
               type: 'category',
               data: {{ years|safe }}
@@ -28,7 +54,7 @@
           },
           series: [{
               data: {{ counts|safe }},
-              type: 'line'  // 或 'bar' 对于柱状图
+              type: 'line'
           }]
       };
       dist_line.setOption(dist_lineOption);
@@ -48,21 +74,7 @@
           }]
       };
       dist_bar.setOption(dist_barOption);
-
-      {% comment %} var inno_barOption = {
-          xAxis: {
-              type: 'category',
-              data: {{ provinces|safe }}
-          },
-          yAxis: {
-              type: 'value'
-          },
-          series: [{
-              data: {{ province_counts|safe }},
-              type: 'bar'
-          }]
-        };
-      inno_bar.setOption(inno_barOption); {% endcomment %}
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

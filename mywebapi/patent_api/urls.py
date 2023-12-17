@@ -20,8 +20,9 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
-    path("search/", views.index, name="search"),
-    path("results/", views.patent_list, name="patent_list"),
+    path("", views.index, name="search"),
+    path("result/", views.patent_list, name="patent_list"),
+    # path("results/", views.patent_list, name="patent_list"),
     path(
         "distribution/",
         views.patent_year_distribution,

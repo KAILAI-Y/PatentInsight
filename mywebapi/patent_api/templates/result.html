@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Search Results and Graphs</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container mt-3">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link active" href="#patents">专利集合</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/distribution?q={{ request.GET.q }}"
+            >专利的年度分布</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/innovation?q={{ request.GET.q }}"
+            >领域创新主体计量/分布</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/network?q={{ request.GET.q }}"
+            >领域合作网络及测度</a
+          >
+        </li>
+      </ul>
+
+      <div class="tab-content">
+        <div id="patents" class="container tab-pane active">
+          <br />
+          {% if patents %}
+          <ul>
+            {% for patent in patents %}
+            <li>{{ patent.title }} ({{ patent.year }})</li>
+            {% empty %}
+            <li>No patents found.</li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p>No patents found.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

@@ -2,7 +2,10 @@
 <html>
   <head>
     <title>Patent Year Distribution</title>
-    <!-- 引入 ECharts 文件 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     {% load static %}
     <script src="{% static 'echarts.js' %}"></script>
     <script src="https://api.map.baidu.com/api?v=3.0&ak={{ baidu_map_ak }} "></script>
@@ -12,9 +15,36 @@
     ></script>
   </head>
   <body>
-    <h1>Graphs</h1>
-    <div id="innovation_bar" style="width: 600px; height: 400px"></div>
-    <div id="innovation_map" style="width: 600px; height: 400px"></div>
+    <div class="container mt-3">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link" href="/result?q={{ request.GET.q }}">专利集合</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/distribution?q={{ request.GET.q }}"
+            >专利的年度分布</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="#graph_inno"
+            >领域创新主体计量/分布</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/network?q={{ request.GET.q }}"
+            >领域合作网络及测度</a
+          >
+        </li>
+      </ul>
+
+      <div class="tab-content">
+        <div id="graph_inno" class="container tab-pane active">
+          <br />
+          <div id="innovation_bar" style="width: 600px; height: 400px"></div>
+          <div id="innovation_map" style="width: 600px; height: 400px"></div>
+        </div>
+      </div>
+    </div>
 
     <script>
       var inno_bar = echarts.init(document.getElementById('innovation_bar'));
@@ -100,7 +130,7 @@
           trigger: 'item'
         },
         bmap: {
-          center: [121.48, 31.22],
+          center: [119.3, 26.08],
           zoom: 5,
           roam: true,
           mapStyle: {
@@ -282,5 +312,6 @@
       };
       inno_mapOption && inno_map.setOption(inno_mapOption);
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
