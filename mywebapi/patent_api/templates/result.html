@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
   <head>
@@ -33,17 +34,72 @@
       <div class="tab-content">
         <div id="patents" class="container tab-pane active">
           <br />
-          {% if patents %}
-          <ul>
-            {% for patent in patents %}
-            <li>{{ patent.title }} ({{ patent.year }})</li>
-            {% empty %}
-            <li>No patents found.</li>
-            {% endfor %}
-          </ul>
-          {% else %}
-          <p>No patents found.</p>
-          {% endif %}
+          {% if page_obj %}
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Year</th>
+                <th>Download</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for patent in page_obj %}
+              <tr>
+                <td>{{ patent.title }}</td>
+                <td>{{ patent.year }}</td>
+                <td>
+                    {% comment %} todo <a> download button {% endcomment %}
+                  <img src="{% static 'download.png' %}" alt="Download" />
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="3">No patents found.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+        {% if page_obj.has_other_pages %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <!-- 第一页和上一页 -->
+                    {% if page_obj.number != 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="?q={% if request.GET.q %}{{request.GET.q}}&page=1{% endif %}">首页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">&laquo;</a>
+                        </li>
+                    {% endif %}
+
+                    <!-- 当前页的前后几页 -->
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item {% if num == page_obj.number %} active {% endif %}">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- 下一页和最后一页 -->
+                    {% if page_obj.number != page_obj.paginator.num_pages %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">&raquo;</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">尾页</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+
+        {% else %}
+            <p>1No patents found.</p>
+        {% endif %}
+
         </div>
       </div>
     </div>

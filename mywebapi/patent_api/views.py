@@ -1,5 +1,6 @@
 from collections import defaultdict
 from django.conf import settings
+from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.db.models import Count
 from django.db import models
@@ -20,7 +21,11 @@ def search(query):
 def patent_list(request):
     query = request.GET.get("q", "")
     patents = search(query)
-    return render(request, "result.html", {"patents": patents})
+    paginator = Paginator(patents, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    print(query)
+    return render(request, "result.html", {"page_obj": page_obj})
 
 
 def patent_year_distribution(request):
