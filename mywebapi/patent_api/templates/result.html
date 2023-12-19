@@ -53,6 +53,7 @@
           <table class="table">
             <thead>
               <tr>
+                <th>No.</th>
                 <th>Title</th>
                 <th>Year</th>
                 <th>Abstract</th>
@@ -61,13 +62,19 @@
             <tbody>
               {% for patent in page_obj %}
               <tr>
-                <td>{{ patent.title }}</td>
-                <td>{{ patent.year }}</td>
-                <td>{{ patent.abstract}}</td>               
+                <td class="number">{{ forloop.counter }}</td>
+                <td class="title">{{ patent.title }}</td>
+                <td class="year">{{ patent.year }}</td>
+                <td class="abstract">
+                  <span class="short-abstract">{{ patent.abstract|truncatechars:100 }}</span>
+                  <span class="full-abstract" style="display:none;">{{ patent.abstract }}</span>
+                  <a href="#" class="more-link" onclick="toggleDetails(this); return false;">Show More</a>
+                  <a href="#" class="less-link" style="display:none;" onclick="toggleDetails(this); return false;">Show Less</a>
+                </td>             
               </tr>
               {% empty %}
               <tr>
-                <td colspan="3">No patents found.</td>
+                <td colspan="4">No patents found.</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -113,6 +120,29 @@
         </div>
       </div>
     </div>
+
+    <script>
+      function toggleDetails(link) {
+        var row = link.parentElement;
+        var shortAbstract = row.querySelector('.short-abstract');
+        var fullAbstract = row.querySelector('.full-abstract');
+        var moreLink = row.querySelector('.more-link');
+        var lessLink = row.querySelector('.less-link');
+
+        if (shortAbstract.style.display === 'none') {
+            shortAbstract.style.display = 'inline';
+            fullAbstract.style.display = 'none';
+            moreLink.style.display = 'inline';
+            lessLink.style.display = 'none';
+        } else {
+            shortAbstract.style.display = 'none';
+            fullAbstract.style.display = 'inline';
+            moreLink.style.display = 'none';
+            lessLink.style.display = 'inline';
+        }
+      }
+
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>

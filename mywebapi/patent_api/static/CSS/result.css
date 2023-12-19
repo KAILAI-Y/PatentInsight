@@ -19,6 +19,30 @@
   height: 30px;
 }
 
+thead {
+  text-align: center;
+}
+
+.number {
+  text-align: center;
+  width: 10%;
+}
+
+.title {
+  font-size: large;
+  font-weight: bold;
+  width: 40%;
+}
+
+.year {
+  text-align: center;
+  width: 10%;
+}
+
+.abstract {
+  width: 40%;
+}
+
 .pagination {
   justify-content: center;
 }
