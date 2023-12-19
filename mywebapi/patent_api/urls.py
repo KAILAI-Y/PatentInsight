@@ -22,7 +22,7 @@ from . import views
 urlpatterns = [
     path("", views.index, name="search"),
     path("result/", views.patent_list, name="patent_list"),
-    # path("results/", views.patent_list, name="patent_list"),
+    path("download_csv/", views.download_csv, name="download_csv"),
     path(
         "distribution/",
         views.patent_year_distribution,

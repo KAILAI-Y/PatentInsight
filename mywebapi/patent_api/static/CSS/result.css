@@ -1,0 +1,24 @@
+#summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#download {
+  display: flex;
+  align-items: center;
+}
+
+#download p,
+#download a {
+  margin: 0;
+  margin-left: 10px;
+}
+
+#download img {
+  height: 30px;
+}
+
+.pagination {
+  justify-content: center;
+}
