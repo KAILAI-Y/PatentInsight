@@ -99,6 +99,7 @@
       };
       dist_bar.setOption(dist_barOption);
 
+      {% comment %} Conclusion Part {% endcomment %}
       function editConclusion() {
         var conclusion = document.getElementById('conclusion');
         var comments = document.getElementById('comments');
@@ -116,9 +117,9 @@
         document.onclick = function() {
           saveButton.style.display = 'none';
         };
-
-
       }
+
+      {% comment %} To-DO: Save Notes {% endcomment %}
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
