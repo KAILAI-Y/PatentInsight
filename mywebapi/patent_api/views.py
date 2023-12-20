@@ -66,7 +66,15 @@ def patent_year_distribution(request):
     years = [item["year"] for item in year_distribution]
     counts = [item["count"] for item in year_distribution]
 
-    context = {"years": years, "counts": counts}
+    most_patents_year = max(year_distribution, key=lambda x: x["count"])["year"]
+    least_patents_year = min(year_distribution, key=lambda x: x["count"])["year"]
+
+    context = {
+        "years": years,
+        "counts": counts,
+        "most_patents_year": most_patents_year,
+        "least_patents_year": least_patents_year,
+    }
     return render(request, "distribution.html", context)
 
 

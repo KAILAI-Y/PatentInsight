@@ -9,6 +9,7 @@
     <!-- 引入 ECharts 文件 -->
     {% load static %}
     <script src="{% static 'echarts.js' %}"></script>
+    <link href="{% static 'CSS/distribution.css' %}" rel="stylesheet" />
   </head>
   <body>
     <div class="container mt-3">
@@ -40,13 +41,31 @@
       <div class="tab-content">
         <div id="graph_dist" class="container tab-pane active">
           <br />
+          <h4>专利年度分布折线图</h4>
           <div id="distribution_line" style="width: 600px; height: 400px"></div>
+          <h4>专利年度分布柱状图</h4>
           <div id="distribution_bar" style="width: 600px; height: 400px"></div>
+          <h4>结论</h4>
+          <div id="conclusion">
+            <div
+              id="write_area"
+              contenteditable="true"
+              onclick="editConclusion()"
+            >
+              最多专利的年份是:
+              <span id="mostPatentsYear">{{ most_patents_year }}</span>.
+              最少专利的年份是:
+              <span id="leastPatentsYear">{{ least_patents_year }}</span>.
+            </div>
+            <span id="comments">添加更多结论或注释...</span>
+            <button id="save_button" onclick="saveUserNotes()">保存注释</button>
+          </div>
         </div>
       </div>
     </div>
 
     <script>
+      {% comment %} Display Graph {% endcomment %}
       var dist_line = echarts.init(document.getElementById('distribution_line'));
       var dist_bar = echarts.init(document.getElementById('distribution_bar'));
 
@@ -66,7 +85,6 @@
       dist_line.setOption(dist_lineOption);
 
       var dist_barOption = {
-          // ECharts 配置项
           xAxis: {
               type: 'category',
               data: {{ years|safe }}
@@ -80,7 +98,29 @@
           }]
       };
       dist_bar.setOption(dist_barOption);
+
+      function editConclusion() {
+        var conclusion = document.getElementById('conclusion');
+        var comments = document.getElementById('comments');
+        var writeArea = document.getElementById('write_area')
+        var saveButton = document.getElementById('save_button');
+
+        writeArea.style.minHeight = '100px';
+        conclusion.onclick = function(event) {
+          comments.style.display = 'none';
+          event.stopPropagation();
+          saveButton.style.display = 'block';
+
+        };
+
+        document.onclick = function() {
+          saveButton.style.display = 'none';
+        };
+
+
+      }
     </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
