@@ -12,6 +12,7 @@
     <link href="{% static 'CSS/distribution.css' %}" rel="stylesheet" />
   </head>
   <body>
+    <script src="{% static 'JS/downloadReport.js' %}"></script>
     <div class="container mt-3">
       <ul class="nav nav-tabs">
         <li class="nav-item">
@@ -31,12 +32,12 @@
           >
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/">下载分析报告</a>
-        </li>
-        <li class="nav-item">
           <a class="nav-link" href="/"> 返回搜索</a>
         </li>
       </ul>
+      <button onclick="downloadReport()" class="btn btn-primary">
+        下载分析报告
+      </button>
 
       <div class="tab-content">
         <div id="graph_dist" class="container tab-pane active">
@@ -63,7 +64,6 @@
         </div>
       </div>
     </div>
-
     <script>
       {% comment %} Display Graph {% endcomment %}
       var dist_line = echarts.init(document.getElementById('distribution_line'));
@@ -120,6 +120,24 @@
       }
 
       {% comment %} To-DO: Save Notes {% endcomment %}
+
+      {% comment %} Print {% endcomment %}
+      function saveChartData(chartId, chartInstance) {
+        chartInstance.on('finished', function () {
+          var imageData = chartInstance.getDataURL({
+            type: 'png',
+            pixelRatio: 2,
+            backgroundColor: '#fff',
+          })
+
+          localStorage.setItem(chartId, imageData)
+        })
+      }
+
+      saveChartData('distributionLineChart', dist_line);
+      saveChartData('distributionBarChart', dist_bar);
+      const textData = document.getElementById('write_area').innerText;
+      localStorage.setItem('distributionText', textData);
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>

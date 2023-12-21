@@ -1,11 +1,20 @@
+import base64
 from collections import defaultdict
 import csv
+import json
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.db.models import Count
 from django.db import models
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.utils import ImageReader
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from io import BytesIO
+from base64 import b64decode
 from .models import Patent
 
 
@@ -127,3 +136,56 @@ def network_view(request):
             "links_data": links_data,
         },
     )
+
+
+def generate_pdf(request):
+    pdfmetrics.registerFont(TTFont("SimSun", "SimSun.ttf"))
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            charts = data.get("charts", [])
+            # print(charts)
+            text = data.get("text", "")
+
+            response = HttpResponse(content_type="application/pdf")
+            response["Content-Disposition"] = 'attachment; filename="report.pdf"'
+
+            buffer = BytesIO()
+            p = canvas.Canvas(buffer)
+
+            p.setFont("SimSun", 12)
+            y_position = 750
+            p.drawString(50, y_position, text)
+            y_position -= 20
+
+            image_height = 300
+            y_position -= image_height
+            for chart_data in charts:
+                if y_position < 100:
+                    p.showPage()
+                    y_position = 750 - image_height
+
+                chart_image = b64decode(chart_data.split(",")[1])
+                chart_image_stream = BytesIO(chart_image)
+                chart_image_stream.seek(0)
+
+                p.drawImage(
+                    ImageReader(chart_image_stream),
+                    50,
+                    y_position,
+                    width=400,
+                    height=300,
+                )
+                y_position -= 320
+
+            p.showPage()
+            p.save()
+            buffer.seek(0)
+            response.write(buffer.getvalue())
+            buffer.close()
+
+            return response
+        except Exception as e:
+            return HttpResponse(f"Error generating PDF: {e}", status=500)
+
+    return HttpResponse("Invalid request", status=400)

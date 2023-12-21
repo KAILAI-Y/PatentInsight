@@ -38,4 +38,5 @@ urlpatterns = [
         views.network_view,
         name="network_view",
     ),
+    path("generate_pdf/", views.generate_pdf, name="generate_pdf"),
 ]
