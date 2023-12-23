@@ -23,7 +23,7 @@ function downloadReport() {
   var titleText4 = localStorage.getItem('titleText4')
   var innovationText = localStorage.getItem('innovationText')
 
-  var networkData = localStorage.getItem('networkChart')
+  var networkChartData = localStorage.getItem('networkChart')
   var titleText5 = localStorage.getItem('titleText5')
   var networkText = localStorage.getItem('networkText')
 
@@ -31,9 +31,9 @@ function downloadReport() {
     charts: [
       { title: titleText1, imageData: distributionlineChartData },
       { title: titleText2, imageData: distributionbarChartData },
-      // { title: titleText3, imageData: innovationBarChartData },
-      // { title: titleText4, imageData: innovationMapChartData },
-      { title: titleText5, imageData: networkData },
+      { title: titleText3, imageData: innovationBarChartData },
+      { title: titleText4, imageData: innovationMapChartData },
+      { title: titleText5, imageData: networkChartData },
     ],
     text: distributionText + '\n' + innovationText + '\n' + networkText,
   }

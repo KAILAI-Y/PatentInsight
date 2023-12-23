@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html>
   <head>
     <title>Patent Year Distribution</title>
@@ -6,9 +7,7 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <!-- 引入 ECharts 文件 -->
-    {% load static %}
-    <script src="{% static 'echarts.js' %}"></script>
+    <script src="{% static 'JS/echarts.js' %}"></script>
     <link href="{% static 'CSS/styles.css' %}" rel="stylesheet" />
   </head>
   <body>

@@ -108,39 +108,6 @@ def province_innovation(request):
     return render(request, "innovation.html", context)
 
 
-# def city_innovation(request):
-#     query = request.GET.get("q", "")
-#     patents = search(query)
-
-#     data = [("清华大学", 12), ("北京大学", 13), ("复旦大学", 18)]
-#     df = pd.DataFrame(data, columns=["X", "Y"])
-#     result = {"conclusion": "abc", "datax": df["X"].tolist(), "datay": df["Y"].tolist()}
-#     print(result.mapdata)
-#     return_json = {"conclusion": "", "data": [("北京市", 12), ("上海市", 13), ("浙江省", 18)]}
-#     return render(request, "innovation.html", {"result": result})
-
-
-def city_innovation(request):
-    query = request.GET.get("q", "")
-    patents = search(query)
-
-    city_counts = (
-        patents.values("city").annotate(count=Count("id")).order_by("-count")[:10]
-    )
-    map_data = [{"name": item["city"], "value": item["count"]} for item in city_counts]
-    print(city_counts)
-
-    cities = [item["city"] for item in city_counts]
-    city_count = [item["count"] for item in city_counts]
-
-    context = {
-        "cities": cities,
-        "city_count": city_count,
-        "map_data": map_data,
-    }
-    return render(request, "innovation.html", context)
-
-
 def network_view(request):
     query = request.GET.get("q", "")
     patents = search(query)
@@ -172,80 +139,80 @@ def network_view(request):
     )
 
 
-# def generate_pdf(request):
-#     pdfmetrics.registerFont(TTFont("SimSun", "SimSun.ttf"))
-#     if request.method == "POST":
-#         try:
-#             data = json.loads(request.body)
-#             text = data.get("text", "")
-
-#             response = HttpResponse(content_type="application/pdf")
-#             response["Content-Disposition"] = 'attachment; filename="report.pdf"'
-
-#             buffer = BytesIO()
-#             p = canvas.Canvas(buffer)
-
-#             p.setFont("SimSun", 14)
-#             y_position = 750
-#             p.drawString(50, y_position, "结论")
-#             y_position -= 20
-#             p.setFont("SimSun", 12)
-#             p.drawString(50, y_position, text)
-#             y_position -= 20
-
-#             for chart in data.get("charts", []):
-#                 title = chart.get("title", "")
-#                 chart_image = b64decode(chart["imageData"].split(",")[1])
-#                 chart_image_stream = BytesIO(chart_image)
-#                 chart_image_stream.seek(0)
-
-#                 if y_position < 100:
-#                     p.showPage()
-#                     y_position = 750 - image_height
-
-#                 p.drawString(50, y_position, title)
-#                 y_position -= 20
-
-#                 image_height = 300
-#                 y_position -= image_height
-
-#                 p.drawImage(
-#                     ImageReader(chart_image_stream),
-#                     50,
-#                     y_position,
-#                     width=400,
-#                     height=300,
-#                 )
-
-#             p.showPage()
-#             y_position = 750
-#             p.save()
-#             buffer.seek(0)
-#             response.write(buffer.getvalue())
-#             buffer.close()
-
-#             return response
-#         except Exception as e:
-#             return HttpResponse(f"Error generating PDF: {e}", status=500)
-
-#     return HttpResponse("Invalid request", status=400)
-
-
 def generate_pdf(request):
-    response = HttpResponse(content_type="application/pdf")
-    response["Content-Disposition"] = 'attachment; filename="test.pdf"'
+    pdfmetrics.registerFont(TTFont("SimSun", "SimSun.ttf"))
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            text = data.get("text", "")
 
-    buffer = BytesIO()
-    p = canvas.Canvas(buffer)
+            response = HttpResponse(content_type="application/pdf")
+            response["Content-Disposition"] = 'attachment; filename="report.pdf"'
 
-    # 使用已知良好的 base64 图像数据
-    known_good_image_data = "data:image/png;base64,..."  # 替换为实际的 base64 数据
-    image_data = b64decode(known_good_image_data.split(",")[1])
-    image_stream = BytesIO(image_data)
-    p.drawImage(ImageReader(image_stream), 100, 500, width=400, height=300)
+            buffer = BytesIO()
+            p = canvas.Canvas(buffer)
 
-    p.showPage()
-    p.save()
-    buffer.seek(0)
-    response.write(buffer.getvalue())
-    return response
+            image_height = 300
+            y_position = 750
+
+            for chart in data.get("charts", []):
+                title = chart.get("title", "")
+                chart_image = b64decode(chart["imageData"].split(",")[1])
+                chart_image_stream = BytesIO(chart_image)
+                chart_image_stream.seek(0)
+
+                if y_position < 300:
+                    p.showPage()
+                    y_position = 750
+
+                p.setFont("SimSun", 12)
+                p.drawString(50, y_position, title)
+                y_position -= 20
+
+                y_position -= image_height
+
+                p.drawImage(
+                    ImageReader(chart_image_stream),
+                    50,
+                    y_position,
+                    width=400,
+                    height=image_height,
+                )
+
+            p.showPage()
+            p.setFont("SimSun", 14)
+            y_position = 750
+            p.drawString(50, y_position, "结论")
+            y_position -= 20
+            p.setFont("SimSun", 12)
+            p.drawString(50, y_position, text)
+            p.save()
+            buffer.seek(0)
+            response.write(buffer.getvalue())
+            buffer.close()
+
+            return response
+        except Exception as e:
+            return HttpResponse(f"Error generating PDF: {e}", status=500)
+
+    return HttpResponse("Invalid request", status=400)
+
+
+# def generate_pdf(request):
+#     response = HttpResponse(content_type="application/pdf")
+#     response["Content-Disposition"] = 'attachment; filename="test.pdf"'
+
+#     buffer = BytesIO()
+#     p = canvas.Canvas(buffer)
+
+#     # 使用已知良好的 base64 图像数据
+#     known_good_image_data = "data:image/png;base64,..."  # 替换为实际的 base64 数据
+#     image_data = b64decode(known_good_image_data.split(",")[1])
+#     image_stream = BytesIO(image_data)
+#     p.drawImage(ImageReader(image_stream), 100, 500, width=400, height=300)
+
+#     p.showPage()
+#     p.save()
+#     buffer.seek(0)
+#     response.write(buffer.getvalue())
+#     return response

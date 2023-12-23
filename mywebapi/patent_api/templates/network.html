@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html>
   <head>
     <title>Patent Year Distribution</title>
@@ -6,12 +7,9 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <!-- html2canvas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
-
-    {% load static %}
-    <script src="{% static 'echarts.js' %}"></script>
     <link href="{% static 'CSS/styles.css' %}" rel="stylesheet" />
+    <script src="{% static 'JS/echarts.js' %}"></script>
+    <script src="{% static 'JS/html2canvas.min.js' %}"></script>
   </head>
   <body>
     <script src="{% static 'JS/downloadReport.js' %}"></script>
@@ -93,7 +91,7 @@
       
       html2canvas(document.getElementById('networkChart')).then(canvas => {
         var base64Image = canvas.toDataURL('image/png');
-        localStorage.setItem('networkData', base64Image);
+        localStorage.setItem('networkChart', base64Image);
       });
       
 
