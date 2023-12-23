@@ -1,13 +1,41 @@
+function saveChartData(chartId, chartInstance) {
+  chartInstance.on('finished', function () {
+    var imageData = chartInstance.getDataURL({
+      type: 'png',
+      pixelRatio: 2,
+      backgroundColor: '#fff',
+    })
+
+    localStorage.setItem(chartId, imageData)
+  })
+}
+
 function downloadReport() {
-  // 收集所有必要的数据
-  var distLineChartData = localStorage.getItem('distributionLineChart')
-  var distBarChartData = localStorage.getItem('distributionBarChart')
-  var conclusionText = localStorage.getItem('conclusionText')
+  var distributionlineChartData = localStorage.getItem('distributionLineChart')
+  var distributionbarChartData = localStorage.getItem('distributionBarChart')
+  var titleText1 = localStorage.getItem('titleText1')
+  var titleText2 = localStorage.getItem('titleText2')
+  var distributionText = localStorage.getItem('distributionText')
+
+  var innovationBarChartData = localStorage.getItem('innovationBarChart')
+  var innovationMapChartData = localStorage.getItem('innovationMapChart')
+  var titleText3 = localStorage.getItem('titleText3')
+  var titleText4 = localStorage.getItem('titleText4')
+  var innovationText = localStorage.getItem('innovationText')
+
+  var networkData = localStorage.getItem('networkChart')
+  var titleText5 = localStorage.getItem('titleText5')
+  var networkText = localStorage.getItem('networkText')
 
   var reportData = {
-    charts: [distLineChartData, distBarChartData /*, 其他图表数据 */],
-    text: conclusionText,
-    // 包含其他需要的文本或数据
+    charts: [
+      { title: titleText1, imageData: distributionlineChartData },
+      { title: titleText2, imageData: distributionbarChartData },
+      // { title: titleText3, imageData: innovationBarChartData },
+      // { title: titleText4, imageData: innovationMapChartData },
+      { title: titleText5, imageData: networkData },
+    ],
+    text: distributionText + '\n' + innovationText + '\n' + networkText,
   }
 
   fetch('/generate_pdf/', {

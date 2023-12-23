@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html>
   <head>
     <title>Patent Year Distribution</title>
@@ -6,15 +7,21 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    {% load static %}
-    <script src="{% static 'echarts.js' %}"></script>
-    <script src="https://api.map.baidu.com/api?v=3.0&ak={{ baidu_map_ak }} "></script>
-    <script
+    <script src="{% static 'JS/echarts.js' %}"></script>
+    <script src="{% static 'JS/echarts.min.js' %}"></script>
+    <script src="{% static 'JS/china.js' %}"></script>
+    <script src="{% static 'JS/china_province_geo.js' %}"></script>
+    <script src="{% static 'JS/html2canvas.min.js' %}"></script>
+    <script src="{% static 'JS/downloadReport.js' %}"></script>
+    {% comment %} <script src="https://api.map.baidu.com/api?v=3.0&ak={{ baidu_map_ak }} "></script> {% endcomment %}
+     {% comment %} <script
       type="text/javascript"
       src="https://cdn.jsdelivr.net/npm/echarts@5/dist/extension/bmap.min.js"
-    ></script>
+    ></script> {% endcomment %}
+    <link href="{% static 'CSS/styles.css' %}" rel="stylesheet" />
   </head>
   <body>
+
     <div class="container mt-3">
       <ul class="nav nav-tabs">
         <li class="nav-item">
@@ -36,18 +43,31 @@
           >
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/">下载分析报告</a>
-        </li>
-        <li class="nav-item">
           <a class="nav-link" href="/"> 返回搜索</a>
         </li>
       </ul>
+      <button onclick="downloadReport()" class="btn btn-primary">
+        下载分析报告
+      </button>
 
       <div class="tab-content">
         <div id="graph_inno" class="container tab-pane active">
           <br />
+          <h4 id="title3">领域创新主体计量柱状图</h4>
           <div id="innovation_bar" style="width: 600px; height: 400px"></div>
+          <h4 id="title4">领域创新主体分布地域图</h4>
           <div id="innovation_map" style="width: 900px; height: 700px"></div>
+          <div id="conclusion">
+            <h4>结论</h4>
+            <div
+              id="write_area"
+              contenteditable="true"
+              onclick="editConclusion()"
+            >
+              结论结论结论
+            </div>
+            <span id="comments">添加更多结论或注释...</span>
+            <button id="save_button" onclick="saveUserNotes()">保存注释</button>
         </div>
       </div>
     </div>
@@ -55,8 +75,21 @@
     <script>
       var inno_bar = echarts.init(document.getElementById('innovation_bar'));
       var inno_map = echarts.init(document.getElementById('innovation_map'));
+
+      function cleanName(name) {
+        return name.replace(/省|市/g, '');
+      }
+
       var provinces = {{ provinces|safe }};
       var province_count = {{ province_count|safe }};
+
+      var data = provinces.map(function(province, index) {
+          return {
+              name: cleanName(province),
+              value: province_count[index]
+          };
+      });
+
       var inno_barOption = {
           xAxis: {
               type: 'category',
@@ -72,251 +105,57 @@
         };
       inno_bar.setOption(inno_barOption);
 
-      var data = provinces.map(function(province, index) {
-          return {
-              province: province,
-              count: province_count[index]
-          };
-      });
-      const geoCoordMap = {
-        '甘肃省':[103.73, 36.03],
-        '青海省':[101.74, 36.56],
-        '四川省':[104.06, 30.67],
-        '河北省':[114.48, 38.03],
-        '云南省':[102.73, 25.04],
-        '贵州省':[106.71, 26.57],
-        '湖北省':[114.31, 30.52],
-        '河南省':[113.65, 34.76],
-        '山东省':[117, 36.65],
-        '江苏省':[118.78, 32.04],
-        '安徽省':[117.27, 31.86],
-        '浙江省':[120.19, 30.26],
-        '江西省':[115.89, 28.68],
-        '福建省':[119.3, 26.08],
-        '广东省':[113.23, 23.16],
-        '湖南省':[113, 28.21],
-        '海南省':[110.35, 20.02],
-        '辽宁省':[123.38, 41.8],
-        '吉林省':[125.35, 43.88],
-        '黑龙江省':[126.63, 45.75],
-        '山西省':[112.53, 37.87],
-        '陕西省':[108.95, 34.27],
-        '台湾省':[121.30, 25.03],
-        '北京市':[116.46, 39.92],
-        '上海市':[121.48, 31.22],
-        '重庆市':[106.54, 29.59],
-        '天津市':[117.2, 39.13],
-        '内蒙古':[111.65, 40.82],
-        '广西壮族自治区':[108.33, 22.84],
-        '西藏自治区':[91.11, 29.97],
-        '宁夏回族自治区':[106.27, 38.47],
-        '新疆维吾尔族自治区':[87.68, 43.77],
-        '香港特别行政区':[114.17, 22.28],
-        '澳门特别行政区':[113.54, 22.19]
-      };
-      const convertData = function (data) {
-        var res = [];
-        for (var i = 0; i < data.length; i++) {
-          var geoCoord = geoCoordMap[data[i].province];
-          if (geoCoord) {
-            res.push({
-              name: data[i].province,
-              value: geoCoord.concat(data[i].count)
-            });
-          }
-        }
-        return res;
-      };
-      inno_mapOption = {
-        title: {
-          text: '​领域创新主体分布',
-          left: 'center'
-        },
-        tooltip: {
-          trigger: 'item'
-        },
-        bmap: {
-          center: [135.114129, 30.550339],
-          zoom: 5,
-          roam: true,
-          mapStyle: {
-            styleJson: [
-              {
-                featureType: 'water',
-                elementType: 'all',
-                stylers: {
-                  color: '#d1d1d1'
-                }
-              },
-              {
-                featureType: 'land',
-                elementType: 'all',
-                stylers: {
-                  color: '#f3f3f3'
-                }
-              },
-              {
-                featureType: 'railway',
-                elementType: 'all',
-                stylers: {
-                  visibility: 'off'
-                }
-              },
-              {
-                featureType: 'highway',
-                elementType: 'all',
-                stylers: {
-                  color: '#fdfdfd'
-                }
-              },
-              {
-                featureType: 'highway',
-                elementType: 'labels',
-                stylers: {
-                  visibility: 'off'
-                }
-              },
-              {
-                featureType: 'arterial',
-                elementType: 'geometry',
-                stylers: {
-                  color: '#fefefe'
-                }
-              },
-              {
-                featureType: 'arterial',
-                elementType: 'geometry.fill',
-                stylers: {
-                  color: '#fefefe'
-                }
-              },
-              {
-                featureType: 'poi',
-                elementType: 'all',
-                stylers: {
-                  visibility: 'off'
-                }
-              },
-              {
-                featureType: 'green',
-                elementType: 'all',
-                stylers: {
-                  visibility: 'off'
-                }
-              },
-              {
-                featureType: 'subway',
-                elementType: 'all',
-                stylers: {
-                  visibility: 'off'
-                }
-              },
-              {
-                featureType: 'manmade',
-                elementType: 'all',
-                stylers: {
-                  color: '#d1d1d1'
-                }
-              },
-              {
-                featureType: 'local',
-                elementType: 'all',
-                stylers: {
-                  color: '#d1d1d1'
-                }
-              },
-              {
-                featureType: 'arterial',
-                elementType: 'labels',
-                stylers: {
-                  visibility: 'off'
-                }
-              },
-              {
-                featureType: 'boundary',
-                elementType: 'all',
-                stylers: {
-                  color: '#fefefe'
-                }
-              },
-              {
-                featureType: 'building',
-                elementType: 'all',
-                stylers: {
-                  color: '#d1d1d1'
-                }
-              },
-              {
-                featureType: 'label',
-                elementType: 'labels.text.fill',
-                stylers: {
-                  color: '#999999'
-                }
-              }
-            ]
+      var inno_mapOption = {
+        visualMap: {
+          min: 0,
+          max: Math.max.apply(null, province_count), 
+          left: 'left',
+          top: 'bottom',
+          text: ['高', '低'], 
+          calculable: true,
+          inRange: {
+              color: ['#e0ffff', '#006edd']
           }
         },
         series: [
           {
-            name: '​领域创新',
-            type: 'scatter',
-            coordinateSystem: 'bmap',
-            data: convertData(data),
-            symbolSize: function (val) {
-              return val[2] / 10;
-            },
-            encode: {
-              value: 2
-            },
+            type: 'map',
+            map: 'china',
+            data: data,
             label: {
-              formatter: '{b}',
-              position: 'right',
-              show: false
-            },
-            emphasis: {
-              label: {
-                show: true
-              }
+                show: true,
+                formatter:function(params) {
+                    // 如果数值存在且不为零，则显示省份名称和数值
+                    if (params.value) {
+                        return params.name + '\n' + params.value;
+                    }
+                    // 否则，不显示标签
+                    return '';
+                }
             }
-          },
-          {
-            name: 'Top 5',
-            type: 'effectScatter',
-            coordinateSystem: 'bmap',
-            data: convertData(
-              data
-                .sort(function (a, b) {
-                  return b.value - a.value;
-                })
-                .slice(0, 6)
-            ),
-            symbolSize: function (val) {
-              return val[2] / 5;
-            },
-            encode: {
-              value: 2
-            },
-            showEffectOn: 'render',
-            rippleEffect: {
-              brushType: 'stroke'
-            },
-            label: {
-              formatter: '{b}',
-              position: 'right',
-              show: true
-            },
-            itemStyle: {
-              shadowBlur: 10,
-              shadowColor: '#333'
-            },
-            emphasis: {
-              scale: true
-            },
-            zlevel: 1
           }
         ]
       };
-      inno_mapOption && inno_map.setOption(inno_mapOption);
+      inno_map.setOption(inno_mapOption);
+
+      const textData = document.getElementById('write_area').innerText;
+      localStorage.setItem('innovationText', textData);
+
+      const title3 = document.getElementById('title3').innerText;
+      localStorage.setItem('titleText3', title3);
+      saveChartData('innovationBarChart', inno_bar);
+
+      const title4 = document.getElementById('title4').innerText;
+      localStorage.setItem('titleText4', title4);
+
+      setTimeout(function() {
+        html2canvas(document.getElementById('innovation_map')).then(canvas => {
+          var base64Image = canvas.toDataURL('image/png');
+          localStorage.setItem('innovationMapChart', base64Image);
+        });
+      }, 15000);
+
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>

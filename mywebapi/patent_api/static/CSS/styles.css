@@ -1,0 +1,14 @@
+#conclusion {
+  height: 200px;
+  margin-top: 20px;
+}
+
+#comments {
+  font-size: 10px;
+  color: red;
+}
+
+#save_button {
+  display: none;
+  margin-bottom: 20px;
+}

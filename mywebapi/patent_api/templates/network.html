@@ -6,10 +6,15 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
+
     {% load static %}
     <script src="{% static 'echarts.js' %}"></script>
+    <link href="{% static 'CSS/styles.css' %}" rel="stylesheet" />
   </head>
   <body>
+    <script src="{% static 'JS/downloadReport.js' %}"></script>
     <div class="container mt-3">
       <ul class="nav nav-tabs">
         <li class="nav-item">
@@ -31,17 +36,29 @@
           >
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/">下载分析报告</a>
-        </li>
-        <li class="nav-item">
           <a class="nav-link" href="/"> 返回搜索</a>
         </li>
       </ul>
+      <button onclick="downloadReport()" class="btn btn-primary">
+        下载分析报告
+      </button>
 
       <div class="tab-content">
         <div id="graph_network" class="container tab-pane active">
           <br />
-          <div id="networkChart" style="width: 1000px; height: 1000px"></div>
+          <h4 id="title5">领域合作网络图</h4>
+          <div id="networkChart" style="width: 1200px; height: 800px"></div>
+            <div id="conclusion">
+            <h4>结论</h4>
+            <div
+              id="write_area"
+              contenteditable="true"
+              onclick="editConclusion()"
+            >
+              结论结论结论
+            </div>
+            <span id="comments">添加更多结论或注释...</span>
+            <button id="save_button" onclick="saveUserNotes()">保存注释</button>
         </div>
       </div>
     </div>
@@ -55,18 +72,31 @@
               layout: 'force',
               data: {{ nodes_data|safe }},
               links: {{ links_data|safe }},
-              roam: true,
+              roam: false,
               label: {
                   show: true
               },
               force: {
-                  repulsion: 300,
+                  repulsion: 200,
                   edgeLength: 100
               }
           }]
       };
 
       myChart.setOption(option);
+
+      const textData = document.getElementById('write_area').innerText;
+      localStorage.setItem('networkText', textData);
+
+      const title5 = document.getElementById('title5').innerText;
+      localStorage.setItem('titleText5', title5);
+      
+      html2canvas(document.getElementById('networkChart')).then(canvas => {
+        var base64Image = canvas.toDataURL('image/png');
+        localStorage.setItem('networkData', base64Image);
+      });
+      
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
