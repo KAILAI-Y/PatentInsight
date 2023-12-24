@@ -19,32 +19,34 @@
   <body>
 
     <div class="container mt-3">
-      <ul class="nav nav-tabs">
-        <li class="nav-item">
-          <a class="nav-link" href="/result?q={{ request.GET.q }}">专利集合</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/distribution?q={{ request.GET.q }}"
-            >专利的年度分布</a
-          >
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" href="#graph_inno"
-            >领域创新主体计量/分布</a
-          >
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/network?q={{ request.GET.q }}"
-            >领域合作网络及测度</a
-          >
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/"> 返回搜索</a>
-        </li>
-      </ul>
-      <button onclick="downloadReport()" class="btn btn-primary">
-        下载分析报告
-      </button>
+      <div class="navbar-container">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <a class="nav-link" href="/result?q={{ request.GET.q }}">专利集合</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/distribution?q={{ request.GET.q }}"
+              >专利的年度分布</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="#graph_inno"
+              >领域创新主体计量/分布</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/network?q={{ request.GET.q }}"
+              >领域合作网络及测度</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/"> 返回搜索</a>
+          </li>
+        </ul>
+        <button onclick="downloadReport()" class="btn btn-primary">
+          下载分析报告
+        </button>
+      </div>
 
       <div class="tab-content">
         <div id="graph_inno" class="container tab-pane active">

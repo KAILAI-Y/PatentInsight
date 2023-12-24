@@ -1,21 +1,17 @@
-import base64
-from collections import defaultdict
-import csv
-import json
-from django.conf import settings
 from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.db.models import Count
 from django.db import models
-import pandas as pd
 from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from collections import defaultdict
 from io import BytesIO
 from base64 import b64decode
+import csv
+import json
 from .models import Patent
 
 
@@ -205,7 +201,6 @@ def generate_pdf(request):
 #     buffer = BytesIO()
 #     p = canvas.Canvas(buffer)
 
-#     # 使用已知良好的 base64 图像数据
 #     known_good_image_data = "data:image/png;base64,..."  # 替换为实际的 base64 数据
 #     image_data = b64decode(known_good_image_data.split(",")[1])
 #     image_stream = BytesIO(image_data)

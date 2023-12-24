@@ -1,3 +1,9 @@
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 #conclusion {
   height: 200px;
   margin-top: 20px;
