@@ -1,8 +1,11 @@
 from django.core.paginator import Paginator
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.db.models import Count
 from django.db import models
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
@@ -12,6 +15,7 @@ from io import BytesIO
 from base64 import b64decode
 import csv
 import json
+from openai import OpenAI
 from .models import Patent
 
 
@@ -194,20 +198,45 @@ def generate_pdf(request):
     return HttpResponse("Invalid request", status=400)
 
 
-# def generate_pdf(request):
-#     response = HttpResponse(content_type="application/pdf")
-#     response["Content-Disposition"] = 'attachment; filename="test.pdf"'
+client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
-#     buffer = BytesIO()
-#     p = canvas.Canvas(buffer)
 
-#     known_good_image_data = "data:image/png;base64,..."  # 替换为实际的 base64 数据
-#     image_data = b64decode(known_good_image_data.split(",")[1])
-#     image_stream = BytesIO(image_data)
-#     p.drawImage(ImageReader(image_stream), 100, 500, width=400, height=300)
+@csrf_exempt
+@require_http_methods(["POST"])
+def gpt_request(request):
+    try:
+        # 解析请求体中的数据
+        data = json.loads(request.body)
+        base64_images = data.get("base64_images", [])
+        text = data.get("text")
 
-#     p.showPage()
-#     p.save()
-#     buffer.seek(0)
-#     response.write(buffer.getvalue())
-#     return response
+        # 构建用于 GPT-4 视觉模型的消息
+        messages = [{"type": "text", "text": text}]
+        messages.extend(
+            [
+                {"type": "image_url", "image_url": {"url": base64_image}}
+                for base64_image in base64_images
+            ]
+        )
+
+        # 调用 OpenAI GPT-4 视觉模型
+        response = client.chat.completions.create(
+            model="gpt-4-vision-preview",
+            messages=[
+                {
+                    "role": "user",
+                    "content": messages,
+                }
+            ],
+            max_tokens=300,
+        )
+
+        # 提取并返回响应数据
+        generated_text = response.choices[0].message.content
+        last_period_index = generated_text.rfind("。")
+        if last_period_index != -1:
+            generated_text = generated_text[: last_period_index + 1]
+        return JsonResponse({"response": generated_text})
+
+    except json.JSONDecodeError as e:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
