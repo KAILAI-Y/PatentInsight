@@ -12,7 +12,7 @@
     <script src="{% static 'JS/html2canvas.min.js' %}"></script>
   </head>
   <body>
-    <script src="{% static 'JS/downloadReport.js' %}"></script>
+    <script src="{% static 'JS/download-report.js' %}"></script>
     <div class="container mt-3">
       <div class="navbar-container">
         <ul class="nav nav-tabs">
@@ -51,7 +51,7 @@
             <div id="conclusion">
             <h4>结论</h4>
             <div
-              id="write_area"
+              id="write-area"
               contenteditable="true"
               onclick="editConclusion()"
             >
@@ -85,7 +85,7 @@
 
       myChart.setOption(option);
 
-      const textData = document.getElementById('write_area').innerText;
+      const textData = document.getElementById('write-area').innerText;
       localStorage.setItem('networkText', textData);
 
       const title5 = document.getElementById('title5').innerText;

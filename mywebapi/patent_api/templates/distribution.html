@@ -11,7 +11,8 @@
     <link href="{% static 'CSS/styles.css' %}" rel="stylesheet" />
   </head>
   <body>
-    <script src="{% static 'JS/downloadReport.js' %}"></script>
+    <script src="{% static 'JS/download-report.js' %}"></script>
+    <script src="{% static 'JS/gpt-websocket.js' %}"></script>
     <div class="container mt-3">
       <div class="navbar-container">
         <ul class="nav nav-tabs">
@@ -43,7 +44,7 @@
       </div>
 
       <div class="tab-content">
-        <div id="graph_dist" class="container tab-pane active">
+        <div id="graph-dist" class="container tab-pane active">
           <br />
           <h4 id="title1">专利年度分布折线图</h4>
           <div id="distribution_line" style="width: 600px; height: 400px"></div>
@@ -55,12 +56,12 @@
               分析图片
             </button>
             <div
-              id="write_area"
+              id="write-area"
               contenteditable="true"
               onclick="editConclusion()"
             ></div>
             <span id="comments">添加更多结论或注释...</span>
-            <button id="save_button" onclick="saveUserNotes()">保存注释</button>
+            <button id="save-button" onclick="saveUserNotes()">保存注释</button>
           </div>
         </div>
       </div>
@@ -101,7 +102,7 @@
       dist_bar.setOption(dist_barOption);
 
       {% comment %} save graph text data {% endcomment %}
-      const textData = document.getElementById('write_area').innerText;
+      const textData = document.getElementById('write-area').innerText;
       localStorage.setItem('distributionText', textData);
 
       const title1 = document.getElementById('title1').innerText;
@@ -115,10 +116,22 @@
       document.addEventListener('DOMContentLoaded', function() {
         var searchKeyword = "{{ request.GET.q }}";
         document.getElementById('analyze-button').addEventListener('click', function() {
-          var distributionLineChartData = localStorage.getItem('distributionLineChart');
-          var distributionBarChartData = localStorage.getItem('distributionBarChart');
-          var base64Images = [distributionLineChartData, distributionBarChartData].filter(Boolean);
-          fetchGPTConclusion(searchKeyword, base64Images);
+          if (!socket) {
+              console.error("WebSocket not defined");
+              return;
+          }
+
+          if (socket.readyState === WebSocket.OPEN) {
+            var distributionLineChartData = localStorage.getItem('distributionLineChart');
+            var distributionBarChartData = localStorage.getItem('distributionBarChart');
+            var base64Images = [distributionLineChartData, distributionBarChartData].filter(Boolean);
+            socket.send(JSON.stringify({
+              searchKeyword: searchKeyword,
+              base64Images: base64Images
+            }));
+          }else {
+            console.error("WebSocket not build");
+          }
         });
       });
     </script>
