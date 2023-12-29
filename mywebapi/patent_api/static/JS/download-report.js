@@ -1,8 +1,8 @@
 function editConclusion() {
-  var conclusion = document.getElementById('conclusion')
-  var comments = document.getElementById('comments')
-  var writeArea = document.getElementById('write-area')
-  var saveButton = document.getElementById('save-button')
+  const conclusion = document.querySelector('.conclusion')
+  const comments = document.querySelector('#comments')
+  const writeArea = document.querySelector('#write-area')
+  const saveButton = document.querySelector('#save-button')
 
   writeArea.style.minHeight = '100px'
   conclusion.onclick = function (event) {

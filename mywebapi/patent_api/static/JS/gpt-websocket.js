@@ -1,6 +1,6 @@
 var socket
 
-document.addEventListener('DOMContentLoaded', function () {
+function initializeWebSocket() {
   socket = new WebSocket('ws://' + window.location.host + '/ws/gpt/')
 
   socket.onopen = function (e) {
@@ -9,28 +9,41 @@ document.addEventListener('DOMContentLoaded', function () {
 
   socket.onmessage = function (e) {
     var data = JSON.parse(e.data)
-    // console.log('Received WebSocket message: ', data)
     var message = data.message
     document.getElementById('write-area').innerHTML += message
-    // document.getElementById('write-area').innerHTML = ''
-    // typeWriter(message, 'write-area')
+    // typeWriter(message, 'write-area', 0)
+    document.getElementById('loading').style.display = 'none'
+    // console.log(message)
   }
 
   socket.onclose = function (e) {
     console.error('WebSocket 连接意外关闭')
   }
-})
+}
 
-// function typeWriter(text, elementId, speed = 50) {
-//   console.log('typeWriter called with text: ' + text)
-//   let i = 0
-//   function typing() {
-//     if (i < text.length) {
-//       console.log('Adding character: ' + text.charAt(i))
-//       document.getElementById(elementId).innerHTML += text.charAt(i)
-//       i++
-//       setTimeout(typing, speed)
-//     }
-//   }
-//   typing()
-// }
+function sendMessage(searchKeyword, base64Images) {
+  if (!socket || socket.readyState !== WebSocket.OPEN) {
+    console.error('WebSocket is not connected')
+    return
+  }
+
+  socket.send(
+    JSON.stringify({
+      searchKeyword: searchKeyword,
+      base64Images: base64Images,
+    })
+  )
+}
+
+function typeWriter(text, elementId, index, speed = 200) {
+  if (index < text.length) {
+    document.getElementById(elementId).innerHTML += text.charAt(index)
+    index++
+    setTimeout(function () {
+      typeWriter(text, elementId, index, speed)
+    }, speed)
+  }
+}
+
+// 导出模块的函数
+export { initializeWebSocket, sendMessage }

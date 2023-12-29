@@ -12,7 +12,7 @@
   </head>
   <body>
     <script src="{% static 'JS/download-report.js' %}"></script>
-    <script src="{% static 'JS/gpt-websocket.js' %}"></script>
+    <script type="module" src="{% static 'JS/distribution.js' %}"></script>
     <div class="container mt-3">
       <div class="navbar-container">
         <ul class="nav nav-tabs">
@@ -50,18 +50,31 @@
           <div id="distribution_line" style="width: 600px; height: 400px"></div>
           <h4 id="title2">专利年度分布柱状图</h4>
           <div id="distribution_bar" style="width: 600px; height: 400px"></div>
-          <div id="conclusion">
-            <h4>结论</h4>
-            <button id="analyze-button" class="btn btn-primary">
-              分析图片
-            </button>
+          <div class="conclusion">
+            <div class="conclusion-row">
+              <h4 class="conclusion-row-label">结论</h4>
+              <button id="conclusion-analyze-button" class="btn btn-primary">
+                分析图表
+              </button>
+            </div>
+            <div id="loading" style="display: none">
+              <div class="loading-icon"></div>
+              <div class="loading-text">正在生成回答，请稍候...</div>
+            </div>
             <div
               id="write-area"
               contenteditable="true"
               onclick="editConclusion()"
             ></div>
             <span id="comments">添加更多结论或注释...</span>
-            <button id="save-button" onclick="saveUserNotes()">保存注释</button>
+
+            <button
+              id="save-button"
+              class="btn btn-light"
+              onclick="saveUserNotes()"
+            >
+              保存注释
+            </button>
           </div>
         </div>
       </div>
@@ -113,9 +126,10 @@
       localStorage.setItem('titleText2', title2);
       saveChartData('distributionBarChart', dist_bar);
 
-      document.addEventListener('DOMContentLoaded', function() {
+      {% comment %} document.addEventListener('DOMContentLoaded', function() {
         var searchKeyword = "{{ request.GET.q }}";
-        document.getElementById('analyze-button').addEventListener('click', function() {
+        document.getElementById('conclusion-analyze-button').addEventListener('click', function() {
+
           if (!socket) {
               console.error("WebSocket not defined");
               return;
@@ -133,7 +147,7 @@
             console.error("WebSocket not build");
           }
         });
-      });
+      }); {% endcomment %}
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -1,3 +1,4 @@
+import time
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 import json
@@ -25,20 +26,13 @@ class GPTConsumer(AsyncWebsocketConsumer):
 
         for chunk in response:
             if chunk.choices[0].delta.content is not None:
-                await self.send_async(
+                print(chunk.choices[0].delta.content)
+                await self.send(
                     text_data=json.dumps({"message": chunk.choices[0].delta.content})
                 )
 
-        # 提取并返回响应数据
-        # generated_text = response.choices[0].message.content
-        # last_period_index = generated_text.rfind("。")
-        # if last_period_index != -1:
-        #     generated_text = generated_text[: last_period_index + 1]
-
-        # await self.send(text_data=json.dumps({"message": generated_text}))
-
-    @database_sync_to_async
-    def call_openai_api(self, prompt_text, base64_images):
+    # @database_sync_to_async
+    async def call_openai_api(self, prompt_text, base64_images):
         # 构建用于 GPT-4 视觉模型的消息
         messages = [{"type": "text", "text": prompt_text}]
         messages.extend(
@@ -56,7 +50,15 @@ class GPTConsumer(AsyncWebsocketConsumer):
             stream=True,
         )
 
-        return response
+        # for chunk in response:
+        #     #     # print(chunk)
+        #     if chunk.choices[0].delta.content is not None:
+        #         print(chunk.choices[0].delta.content)
 
-    async def send_async(self, text_data):
-        await self.send(text_data=text_data)
+        #         await self.send(text_data=json.dumps({"message": "123"}))
+
+        # self.send(
+        #     text_data=json.dumps({"message": chunk.choices[0].delta.content})
+        # )
+
+        return response
