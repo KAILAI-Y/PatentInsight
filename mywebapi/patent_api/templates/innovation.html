@@ -17,11 +17,14 @@
   </head>
   <body>
     <script src="{% static 'JS/download-report.js' %}"></script>
+    <script type="module" src="{% static 'JS/innovation.js' %}"></script>
     <div class="container mt-3">
       <div class="navbar-container">
         <ul class="nav nav-tabs">
           <li class="nav-item">
-            <a class="nav-link" href="/result?q={{ request.GET.q }}">专利集合</a>
+            <a class="nav-link" href="/result?q={{ request.GET.q }}"
+              >专利集合</a
+            >
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/distribution?q={{ request.GET.q }}"
@@ -54,17 +57,32 @@
           <div id="innovation_map" style="width: 900px; height: 700px"></div>
           <h4 id="title3">领域创新主体计量柱状图</h4>
           <div id="innovation_bar" style="width: 600px; height: 400px"></div>
-          <div id="conclusion">
-            <h4>结论</h4>
+          <div class="conclusion">
+            <div class="conclusion-row">
+              <h4 class="conclusion-row-label">结论</h4>
+              <button id="conclusion-analyze-button" class="btn btn-primary">
+                分析图表
+              </button>
+            </div>
+            <div id="loading" style="display: none">
+              <div class="loading-icon"></div>
+              <div class="loading-text">正在生成回答，请稍候...</div>
+            </div>
             <div
               id="write-area"
               contenteditable="true"
               onclick="editConclusion()"
-            >
-              结论结论结论
-            </div>
+            ></div>
             <span id="comments">添加更多结论或注释...</span>
-            <button id="save_button" onclick="saveUserNotes()">保存注释</button>
+
+            <button
+              id="save-button"
+              class="btn btn-light"
+              onclick="saveUserNotes()"
+            >
+              保存注释
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -105,10 +123,10 @@
       var inno_mapOption = {
         visualMap: {
           min: 0,
-          max: Math.max.apply(null, province_count), 
+          max: Math.max.apply(null, province_count),
           left: 'left',
           top: 'bottom',
-          text: ['高', '低'], 
+          text: ['高', '低'],
           calculable: true,
           inRange: {
               color: ['#e0ffff', '#006edd']
@@ -152,8 +170,6 @@
           localStorage.setItem('innovationMapChart', base64Image);
         });
       }, 15000); {% endcomment %}
-
-
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
