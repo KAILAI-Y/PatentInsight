@@ -11,7 +11,9 @@
     <script src="{% static 'JS/echarts.min.js' %}"></script>
     <script src="{% static 'JS/china.js' %}"></script>
     <script src="{% static 'JS/china_province_geo.js' %}"></script>
+    {% comment %}
     <script src="{% static 'JS/html2canvas.min.js' %}"></script>
+    {% endcomment %}
 
     <link href="{% static 'CSS/styles.css' %}" rel="stylesheet" />
   </head>
@@ -39,6 +41,11 @@
           <li class="nav-item">
             <a class="nav-link" href="/network?q={{ request.GET.q }}"
               >领域合作网络及测度</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/wordcloud?q={{ request.GET.q }}"
+              >词云图</a
             >
           </li>
           <li class="nav-item">

@@ -1,3 +1,4 @@
+import os
 from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
@@ -10,13 +11,20 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from collections import defaultdict
+from collections import Counter, defaultdict
 from io import BytesIO
 from base64 import b64decode
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+import jieba
+import jieba.analyse
+import jieba.posseg as pseg
 import csv
 import json
 from openai import OpenAI
 from .models import Patent
+
+client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
 
 def index(request):
@@ -65,7 +73,7 @@ def download_csv(request):
     return response
 
 
-def patent_year_distribution(request):
+def year_distribution(request):
     query = request.GET.get("q", "")
     patents = search(query)
 
@@ -198,9 +206,6 @@ def generate_pdf(request):
     return HttpResponse("Invalid request", status=400)
 
 
-client = OpenAI(api_key=settings.OPENAI_API_KEY)
-
-
 @csrf_exempt
 @require_http_methods(["POST"])
 def gpt_request(request):
@@ -240,3 +245,72 @@ def gpt_request(request):
 
     except json.JSONDecodeError as e:
         return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+
+def generate_wordcloud(patents, query, stopwords_path, base_directory):
+    combined_text = " ".join(patent.title + " " + patent.abstract for patent in patents)
+
+    # 设置结巴分词的停用词
+    jieba.analyse.set_stop_words(stopwords_path)
+    words = pseg.cut(combined_text)
+
+    # 提取名词
+    nouns = [word for word, flag in words if flag.startswith("n")]
+
+    # 将名词合并为一个长字符串
+    combined_nouns = " ".join(nouns)
+
+    # 提取关键词和权重
+    top_keywords = jieba.analyse.textrank(combined_nouns, topK=20, withWeight=True)
+    word_frequencies = {word: weight for word, weight in top_keywords}
+
+    font_path = os.path.join(
+        settings.BASE_DIR, "patent_api", "static", "font", "SimSun.ttf"
+    )
+
+    # 创建词云对象
+    wc = WordCloud(
+        font_path=font_path,
+        width=800,
+        height=400,
+        background_color="white",
+    )
+
+    # 根据词频生成词云
+    wc.generate_from_frequencies(word_frequencies)
+
+    # 构造保存路径
+    filename = f"{query}_wordcloud.png"
+    file_path = os.path.join(base_directory, filename)
+
+    # 保存词云图像
+    wc.to_file(file_path)
+
+    return file_path
+
+
+def generate_wordcloud_view(request):
+    query = request.GET.get("q", "")
+    patents = search(query)
+
+    stopwords_path = os.path.join(
+        settings.BASE_DIR, "patent_api", "static", "baidu_stopwords.txt"
+    )
+    base_directory = os.path.join(
+        settings.BASE_DIR, "patent_api", "static", "images", "wordclouds"
+    )
+
+    if patents.exists():
+        # 生成词云图像并获取图像路径
+        wordcloud_image_path = generate_wordcloud(
+            patents, query, stopwords_path, base_directory
+        )
+
+        image_url = "/static/images/wordclouds/" + os.path.basename(
+            wordcloud_image_path
+        )
+
+    else:
+        image_url = None
+
+    return render(request, "wordcloud.html", {"wordcloud_image": image_url})

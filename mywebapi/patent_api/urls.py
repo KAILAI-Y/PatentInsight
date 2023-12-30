@@ -25,8 +25,8 @@ urlpatterns = [
     path("download_csv/", views.download_csv, name="download_csv"),
     path(
         "distribution/",
-        views.patent_year_distribution,
-        name="patent_year_distribution",
+        views.year_distribution,
+        name="year_distribution",
     ),
     path(
         "innovation/",
@@ -39,5 +39,6 @@ urlpatterns = [
         name="network_view",
     ),
     path("generate_pdf/", views.generate_pdf, name="generate_pdf"),
+    path("wordcloud/", views.generate_wordcloud_view, name="generate_wordcloud_view"),
     # path("gpt_request/", views.gpt_request, name="gpt_request"),
 ]
