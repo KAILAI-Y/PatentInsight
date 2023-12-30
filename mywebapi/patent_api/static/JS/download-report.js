@@ -33,6 +33,8 @@ function getChartData() {
     networkChart: localStorage.getItem('networkChart'),
     titleText5: localStorage.getItem('titleText5'),
     networkText: localStorage.getItem('networkText'),
+    titleText6: localStorage.getItem('titleText6'),
+    wordcloudImage: localStorage.getItem('wordcloud'),
   }
 }
 

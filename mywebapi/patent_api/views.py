@@ -13,6 +13,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from collections import Counter, defaultdict
 from io import BytesIO
+import base64
 from base64 import b64decode
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
@@ -247,7 +248,7 @@ def gpt_request(request):
         return JsonResponse({"error": "Invalid JSON"}, status=400)
 
 
-def generate_wordcloud(patents, query, stopwords_path, base_directory):
+def generate_wordcloud(patents, query, stopwords_path):
     combined_text = " ".join(patent.title + " " + patent.abstract for patent in patents)
 
     # 设置结巴分词的停用词
@@ -279,14 +280,13 @@ def generate_wordcloud(patents, query, stopwords_path, base_directory):
     # 根据词频生成词云
     wc.generate_from_frequencies(word_frequencies)
 
-    # 构造保存路径
-    filename = f"{query}_wordcloud.png"
-    file_path = os.path.join(base_directory, filename)
+    # 将词云图像转换为 Base64 编码
+    img = wc.to_image()
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    image_base64 = base64.b64encode(buffer.getvalue()).decode()
 
-    # 保存词云图像
-    wc.to_file(file_path)
-
-    return file_path
+    return image_base64
 
 
 def generate_wordcloud_view(request):
@@ -296,21 +296,13 @@ def generate_wordcloud_view(request):
     stopwords_path = os.path.join(
         settings.BASE_DIR, "patent_api", "static", "baidu_stopwords.txt"
     )
-    base_directory = os.path.join(
-        settings.BASE_DIR, "patent_api", "static", "images", "wordclouds"
-    )
 
     if patents.exists():
-        # 生成词云图像并获取图像路径
-        wordcloud_image_path = generate_wordcloud(
-            patents, query, stopwords_path, base_directory
-        )
-
-        image_url = "/static/images/wordclouds/" + os.path.basename(
-            wordcloud_image_path
-        )
-
+        # 获取 Base64 编码的词云图像
+        wordcloud_image_base64 = generate_wordcloud(patents, query, stopwords_path)
     else:
-        image_url = None
+        wordcloud_image_base64 = None
 
-    return render(request, "wordcloud.html", {"wordcloud_image": image_url})
+    return render(
+        request, "wordcloud.html", {"wordcloud_image_base64": wordcloud_image_base64}
+    )

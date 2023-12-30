@@ -52,14 +52,19 @@
         <div id="graph-wordcloud" class="container tab-pane active">
           <br />
           <h4 id="title6">词云图</h4>
-          {% if wordcloud_image %}
-          <div>
-            <img
-              src="{{ wordcloud_image }}"
-              alt="Word Cloud Image"
-              style="max-width: 100%; height: auto"
-            />
-          </div>
+          {% if wordcloud_image_base64 %}
+          <img
+            src="data:image/png;base64,{{ wordcloud_image_base64 }}"
+            alt="Word Cloud Image"
+          />
+          <script>
+            const title6 = document.getElementById('title6').innerText
+            localStorage.setItem('titleText6', title6)
+            localStorage.setItem(
+              'wordcloud',
+              'data:image/png;base64,{{ wordcloud_image_base64 }}'
+            )
+          </script>
           {% else %}
           <p>No word cloud available for this query.</p>
           {% endif %}
