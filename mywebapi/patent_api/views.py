@@ -248,26 +248,80 @@ def gpt_request(request):
         return JsonResponse({"error": "Invalid JSON"}, status=400)
 
 
-def generate_wordcloud(patents, query, stopwords_path):
-    combined_text = " ".join(patent.title + " " + patent.abstract for patent in patents)
+# def generate_wordcloud(patents, stopwords_path):
+#     combined_text = " ".join(patent.title + " " + patent.abstract for patent in patents)
+
+#     # 设置结巴分词的停用词
+#     jieba.analyse.set_stop_words(stopwords_path)
+#     words = pseg.cut(combined_text)
+
+#     # 提取名词
+#     nouns = [word for word, flag in words if flag.startswith("n")]
+
+#     # 将名词合并为一个长字符串
+#     combined_nouns = " ".join(nouns)
+
+#     # 提取关键词和权重
+#     top_keywords = jieba.analyse.textrank(combined_nouns, topK=20, withWeight=True)
+#     word_frequencies = {word: weight for word, weight in top_keywords}
+
+#     font_path = os.path.join(
+#         settings.BASE_DIR, "patent_api", "static", "font", "SimSun.ttf"
+#     )
+
+#     # 创建词云对象
+#     wc = WordCloud(
+#         font_path=font_path,
+#         width=800,
+#         height=400,
+#         background_color="white",
+#     )
+
+#     # 根据词频生成词云
+#     wc.generate_from_frequencies(word_frequencies)
+
+#     # 将词云图像转换为 Base64 编码
+#     img = wc.to_image()
+#     buffer = BytesIO()
+#     img.save(buffer, format="PNG")
+#     image_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+#     return image_base64
+
+
+# def generate_wordcloud_view(request):
+#     query = request.GET.get("q", "")
+#     patents = search(query)
+
+#     stopwords_path = os.path.join(
+#         settings.BASE_DIR, "patent_api", "static", "baidu_stopwords.txt"
+#     )
+
+#     if patents.exists():
+#         # 获取 Base64 编码的词云图像
+#         wordcloud_image_base64 = generate_wordcloud(patents, stopwords_path)
+#     else:
+#         wordcloud_image_base64 = None
+
+#     return render(
+#         request, "wordcloud.html", {"wordcloud_image_base64": wordcloud_image_base64}
+#     )
+
+
+def extract_keywords_from_patent(patent, stopwords_path, topK=5):
+    text = patent.title + " " + patent.abstract
 
     # 设置结巴分词的停用词
     jieba.analyse.set_stop_words(stopwords_path)
-    words = pseg.cut(combined_text)
 
-    # 提取名词
-    nouns = [word for word, flag in words if flag.startswith("n")]
+    # 提取关键词
+    keywords = jieba.analyse.textrank(text, topK=topK, withWeight=False)
+    return keywords
 
-    # 将名词合并为一个长字符串
-    combined_nouns = " ".join(nouns)
 
-    # 提取关键词和权重
-    top_keywords = jieba.analyse.textrank(combined_nouns, topK=20, withWeight=True)
-    word_frequencies = {word: weight for word, weight in top_keywords}
-
-    font_path = os.path.join(
-        settings.BASE_DIR, "patent_api", "static", "font", "SimSun.ttf"
-    )
+def generate_wordcloud_from_keywords(keywords_list, font_path):
+    # 将关键词列表合并为一个字符串
+    combined_keywords = " ".join(keywords_list)
 
     # 创建词云对象
     wc = WordCloud(
@@ -277,8 +331,8 @@ def generate_wordcloud(patents, query, stopwords_path):
         background_color="white",
     )
 
-    # 根据词频生成词云
-    wc.generate_from_frequencies(word_frequencies)
+    # 生成词云
+    wc.generate(combined_keywords)
 
     # 将词云图像转换为 Base64 编码
     img = wc.to_image()
@@ -296,10 +350,20 @@ def generate_wordcloud_view(request):
     stopwords_path = os.path.join(
         settings.BASE_DIR, "patent_api", "static", "baidu_stopwords.txt"
     )
+    font_path = os.path.join(
+        settings.BASE_DIR, "patent_api", "static", "font", "SimSun.ttf"
+    )
 
     if patents.exists():
+        all_keywords = []
+        for patent in patents:
+            keywords = extract_keywords_from_patent(patent, stopwords_path)
+            all_keywords.extend(keywords)
+
         # 获取 Base64 编码的词云图像
-        wordcloud_image_base64 = generate_wordcloud(patents, query, stopwords_path)
+        wordcloud_image_base64 = generate_wordcloud_from_keywords(
+            all_keywords, font_path
+        )
     else:
         wordcloud_image_base64 = None
 
