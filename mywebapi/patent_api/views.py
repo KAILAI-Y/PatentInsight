@@ -11,15 +11,20 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from collections import Counter, defaultdict
+from collections import defaultdict
 from io import BytesIO
 import base64
 from base64 import b64decode
 from wordcloud import WordCloud
-import matplotlib.pyplot as plt
 import jieba
 import jieba.analyse
 import jieba.posseg as pseg
+from itertools import combinations
+import networkx as nx
+from networkx import community
+import matplotlib
+from matplotlib.font_manager import FontProperties
+import matplotlib.pyplot as plt
 import csv
 import json
 from openai import OpenAI
@@ -248,74 +253,72 @@ def gpt_request(request):
         return JsonResponse({"error": "Invalid JSON"}, status=400)
 
 
-# def generate_wordcloud(patents, stopwords_path):
-#     combined_text = " ".join(patent.title + " " + patent.abstract for patent in patents)
+def generate_wordcloud(patents, stopwords_path):
+    combined_text = " ".join(patent.title + " " + patent.abstract for patent in patents)
 
-#     # 设置结巴分词的停用词
-#     jieba.analyse.set_stop_words(stopwords_path)
-#     words = pseg.cut(combined_text)
+    # 设置结巴分词的停用词
+    jieba.analyse.set_stop_words(stopwords_path)
+    words = pseg.cut(combined_text)
 
-#     # 提取名词
-#     nouns = [word for word, flag in words if flag.startswith("n")]
+    # 提取名词
+    nouns = [word for word, flag in words if flag.startswith("n")]
 
-#     # 将名词合并为一个长字符串
-#     combined_nouns = " ".join(nouns)
+    # 将名词合并为一个长字符串
+    combined_nouns = " ".join(nouns)
 
-#     # 提取关键词和权重
-#     top_keywords = jieba.analyse.textrank(combined_nouns, topK=20, withWeight=True)
-#     word_frequencies = {word: weight for word, weight in top_keywords}
+    # 提取关键词和权重
+    top_keywords = jieba.analyse.textrank(combined_nouns, topK=20, withWeight=True)
+    word_frequencies = {word: weight for word, weight in top_keywords}
 
-#     font_path = os.path.join(
-#         settings.BASE_DIR, "patent_api", "static", "font", "SimSun.ttf"
-#     )
+    font_path = os.path.join(
+        settings.BASE_DIR, "patent_api", "static", "font", "SimSun.ttf"
+    )
 
-#     # 创建词云对象
-#     wc = WordCloud(
-#         font_path=font_path,
-#         width=800,
-#         height=400,
-#         background_color="white",
-#     )
+    # 创建词云对象
+    wc = WordCloud(
+        font_path=font_path,
+        width=800,
+        height=400,
+        background_color="white",
+    )
 
-#     # 根据词频生成词云
-#     wc.generate_from_frequencies(word_frequencies)
+    # 根据词频生成词云
+    wc.generate_from_frequencies(word_frequencies)
 
-#     # 将词云图像转换为 Base64 编码
-#     img = wc.to_image()
-#     buffer = BytesIO()
-#     img.save(buffer, format="PNG")
-#     image_base64 = base64.b64encode(buffer.getvalue()).decode()
+    # 将词云图像转换为 Base64 编码
+    img = wc.to_image()
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    image_base64 = base64.b64encode(buffer.getvalue()).decode()
 
-#     return image_base64
-
-
-# def generate_wordcloud_view(request):
-#     query = request.GET.get("q", "")
-#     patents = search(query)
-
-#     stopwords_path = os.path.join(
-#         settings.BASE_DIR, "patent_api", "static", "baidu_stopwords.txt"
-#     )
-
-#     if patents.exists():
-#         # 获取 Base64 编码的词云图像
-#         wordcloud_image_base64 = generate_wordcloud(patents, stopwords_path)
-#     else:
-#         wordcloud_image_base64 = None
-
-#     return render(
-#         request, "wordcloud.html", {"wordcloud_image_base64": wordcloud_image_base64}
-#     )
+    return image_base64
 
 
-def extract_keywords_from_patent(patent, stopwords_path, topK=5):
+def extract_keywords_from_patent(patent, topK=5):
     text = patent.title + " " + patent.abstract
+
+    stopwords_path = os.path.join(
+        settings.BASE_DIR, "patent_api", "static", "baidu_stopwords.txt"
+    )
 
     # 设置结巴分词的停用词
     jieba.analyse.set_stop_words(stopwords_path)
 
-    # 提取关键词
-    keywords = jieba.analyse.textrank(text, topK=topK, withWeight=False)
+    # 进行分词和词性标注
+    words = pseg.cut(text)
+
+    # 提取名词
+    nouns = [
+        word
+        for word, flag in words
+        if flag.startswith("n") and word not in stopwords_path
+    ]
+
+    combined_nouns = " ".join(nouns)
+
+    keywords = jieba.analyse.textrank(combined_nouns, topK=topK, withWeight=False)
+    # print(keywords)
+
     return keywords
 
 
@@ -347,9 +350,6 @@ def generate_wordcloud_view(request):
     query = request.GET.get("q", "")
     patents = search(query)
 
-    stopwords_path = os.path.join(
-        settings.BASE_DIR, "patent_api", "static", "baidu_stopwords.txt"
-    )
     font_path = os.path.join(
         settings.BASE_DIR, "patent_api", "static", "font", "SimSun.ttf"
     )
@@ -357,7 +357,7 @@ def generate_wordcloud_view(request):
     if patents.exists():
         all_keywords = []
         for patent in patents:
-            keywords = extract_keywords_from_patent(patent, stopwords_path)
+            keywords = extract_keywords_from_patent(patent)
             all_keywords.extend(keywords)
 
         # 获取 Base64 编码的词云图像
@@ -370,3 +370,100 @@ def generate_wordcloud_view(request):
     return render(
         request, "wordcloud.html", {"wordcloud_image_base64": wordcloud_image_base64}
     )
+
+
+def calculate_cooccurrence(all_keywords):
+    cooccurrence_counts = defaultdict(int)
+    for keywords in all_keywords:
+        # 计算每篇专利中关键词的共现关系
+        for keyword1, keyword2 in combinations(set(keywords), 2):
+            cooccurrence_counts[(keyword1, keyword2)] += 1
+            cooccurrence_counts[(keyword2, keyword1)] += 1
+    return cooccurrence_counts
+
+
+def create_network_graph(cooccurrence_counts):
+    G = nx.Graph()
+    for (word1, word2), count in cooccurrence_counts.items():
+        G.add_edge(word1, word2, weight=count)
+    return G
+
+
+def detect_communities(G):
+    communities = community.girvan_newman(G)
+    top_level_communities = next(communities)
+    return sorted(map(sorted, top_level_communities))
+
+
+matplotlib.use("Agg")
+plt.rcParams["font.sans-serif"] = ["SimSun"]
+
+
+# function to create node colour list
+def create_community_node_colors(graph, communities):
+    number_of_colors = len(communities[0])
+    colors = ["#D4FCB1", "#CDC5FC", "#FFC2C4", "#F2D140", "#BCC6C8"][:number_of_colors]
+    node_colors = []
+    for node in graph:
+        current_community_index = 0
+        for community in communities:
+            if node in community:
+                node_colors.append(colors[current_community_index])
+                break
+            current_community_index += 1
+    return node_colors
+
+
+# function to plot graph with node colouring based on communities
+def visualize_communities(graph, communities):
+    node_colors = create_community_node_colors(graph, communities)
+    modularity = round(nx.community.modularity(graph, communities), 6)
+    title = f"Community Visualization of {len(communities)} communities with modularity of {modularity}"
+    pos = nx.spring_layout(graph, k=1, iterations=100)
+
+    plt.title(title)
+    nx.draw(
+        graph,
+        pos=pos,
+        node_size=2000,
+        node_color=node_colors,
+        with_labels=True,
+        font_size=16,
+        font_color="black",
+        font_family="SimSun",
+    )
+
+
+def keyword_network(request):
+    query = request.GET.get("q", "")
+    patents = search(query)
+
+    if not patents:
+        return JsonResponse({"error": "No patents found"})
+    else:
+        all_keywords = [extract_keywords_from_patent(patent) for patent in patents]
+        cooccurrence = calculate_cooccurrence(all_keywords)
+
+        G = create_network_graph(cooccurrence)
+        communities = detect_communities(G)
+        # print("Detected communities:", communities)
+
+        # 为可视化设置画布和图像保存路径
+        plt.figure(figsize=(20, 15))
+        file_name = f"network_{query}.png"
+        image_path = os.path.join(
+            settings.BASE_DIR, "patent_api", "static", "images", file_name
+        )
+
+        # 绘制网络图并保存
+        visualize_communities(G, communities)
+        plt.savefig(image_path)
+        plt.close()
+
+        # 返回图像路径
+        image_url = "/static/images/" + file_name
+        return JsonResponse({"image_url": image_url})
+
+
+def word_network_view(request):
+    return render(request, "word_network.html")

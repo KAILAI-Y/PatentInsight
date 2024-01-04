@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+  <head>
+    <title>Patent Year Distribution</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link href="{% static 'CSS/styles.css' %}" rel="stylesheet" />
+    <script src="{% static 'JS/echarts.js' %}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <script src="{% static 'JS/download-report.js' %}"></script>
+    <script type="module" src="{% static 'JS/network.js' %}"></script>
+    <div class="container mt-3">
+      <div class="navbar-container">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <a class="nav-link" href="/result?q={{ request.GET.q }}"
+              >专利集合</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/distribution?q={{ request.GET.q }}"
+              >专利的年度分布</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/innovation?q={{ request.GET.q }}"
+              >领域创新主体计量/分布</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="/network?q={{ request.GET.q }}"
+              >领域合作网络及测度</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/wordcloud?q={{ request.GET.q }}"
+              >词云图</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#word-network-chart">主题词关系图</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/"> 返回搜索</a>
+          </li>
+        </ul>
+        <button onclick="downloadReport()" class="btn btn-primary">
+          下载分析报告
+        </button>
+      </div>
+
+      <div class="tab-content">
+        <div id="graph_network" class="container tab-pane active">
+          <br />
+          <h4 id="title6">主题词关系图</h4>
+          <div
+            id="word-network-chart"
+            style="width: 1200px; height: 800px"
+          ></div>
+          <div class="conclusion">
+            <div class="conclusion-row">
+              <h4 class="conclusion-row-label">结论</h4>
+              <button id="conclusion-analyze-button" class="btn btn-primary">
+                分析图表
+              </button>
+            </div>
+            <div id="loading" style="display: none">
+              <div class="loading-icon"></div>
+              <div class="loading-text">正在生成回答，请稍候...</div>
+            </div>
+            <div
+              id="write-area"
+              contenteditable="true"
+              onclick="editConclusion()"
+            ></div>
+            <span id="comments">添加更多结论或注释...</span>
+
+            <button
+              id="save-button"
+              class="btn btn-light"
+              onclick="saveUserNotes()"
+            >
+              保存注释
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      {% comment %} document.addEventListener('DOMContentLoaded', function () {
+        fetch('/keyword-network/?q=' + encodeURIComponent('{{request.GET.q}}'))
+          .then(response => response.json())
+          .then(data => {
+              initECharts(data);
+          });
+      });
+
+      function initECharts(data) {
+          var myChart = echarts.init(document.getElementById('word-network-chart'));
+          var option = {
+              // ECharts 配置...
+              series: [
+                  {
+                      type: 'graph',
+                      layout: 'force',
+                      data: data.nodes,
+                      links: data.links,
+                      categories: data.communities.map((_, idx) => ({ name: 'Community ' + idx })),
+                      // 其他 graph 配置...
+                  }
+              ]
+          };
+          myChart.setOption(option);
+      } {% endcomment %}
+      {% comment %}
+      var url = '/word-network/?q=' + encodeURIComponent('{{ request.GET.q }}')
+
+      $.getJSON(url, function (graph) {
+        console.log(graph)
+        myChart.hideLoading()
+
+        option = {
+          title: {
+            text: 'Keyword Co-occurrence Graph',
+            subtext: 'Based on patent data',
+            top: 'bottom',
+            left: 'right',
+          },
+          tooltip: {},
+          animationDuration: 1500,
+          animationEasingUpdate: 'quinticInOut',
+          series: [
+            {
+              name: 'Keywords',
+              type: 'graph',
+              layout: 'force',
+              data: graph.nodes,
+              links: graph.links,
+              roam: true,
+              label: {
+                position: 'right',
+                formatter: '{b}',
+              },
+              force: {
+                repulsion: 100,
+                edgeLength: 50,
+              },
+              lineStyle: {
+                color: 'source',
+                curveness: 0.3,
+              },
+              emphasis: {
+                focus: 'adjacency',
+                lineStyle: {
+                  width: 10,
+                },
+              },
+            },
+          ],
+        }
+
+        myChart.setOption(option)
+      }).fail(function (jqXHR, textStatus, errorThrown) {
+        console.error('AJAX Request Failed: ', textStatus, errorThrown)
+      }) {% endcomment %}
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
