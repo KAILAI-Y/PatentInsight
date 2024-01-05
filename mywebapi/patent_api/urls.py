@@ -40,6 +40,6 @@ urlpatterns = [
     ),
     path("generate_pdf/", views.generate_pdf, name="generate_pdf"),
     path("wordcloud/", views.generate_wordcloud_view, name="generate_wordcloud_view"),
-    path("word-network/", views.keyword_network, name="word_network"),
+    path("word-network/", views.word_network_view, name="word_network"),
     # path("gpt_request/", views.gpt_request, name="gpt_request"),
 ]

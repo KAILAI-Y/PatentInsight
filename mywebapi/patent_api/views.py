@@ -253,47 +253,6 @@ def gpt_request(request):
         return JsonResponse({"error": "Invalid JSON"}, status=400)
 
 
-def generate_wordcloud(patents, stopwords_path):
-    combined_text = " ".join(patent.title + " " + patent.abstract for patent in patents)
-
-    # 设置结巴分词的停用词
-    jieba.analyse.set_stop_words(stopwords_path)
-    words = pseg.cut(combined_text)
-
-    # 提取名词
-    nouns = [word for word, flag in words if flag.startswith("n")]
-
-    # 将名词合并为一个长字符串
-    combined_nouns = " ".join(nouns)
-
-    # 提取关键词和权重
-    top_keywords = jieba.analyse.textrank(combined_nouns, topK=20, withWeight=True)
-    word_frequencies = {word: weight for word, weight in top_keywords}
-
-    font_path = os.path.join(
-        settings.BASE_DIR, "patent_api", "static", "font", "SimSun.ttf"
-    )
-
-    # 创建词云对象
-    wc = WordCloud(
-        font_path=font_path,
-        width=800,
-        height=400,
-        background_color="white",
-    )
-
-    # 根据词频生成词云
-    wc.generate_from_frequencies(word_frequencies)
-
-    # 将词云图像转换为 Base64 编码
-    img = wc.to_image()
-    buffer = BytesIO()
-    img.save(buffer, format="PNG")
-    image_base64 = base64.b64encode(buffer.getvalue()).decode()
-
-    return image_base64
-
-
 def extract_keywords_from_patent(patent, topK=5):
     text = patent.title + " " + patent.abstract
 
@@ -401,6 +360,7 @@ plt.rcParams["font.sans-serif"] = ["SimSun"]
 
 # function to create node colour list
 def create_community_node_colors(graph, communities):
+    print(len(communities))
     number_of_colors = len(communities[0])
     colors = ["#D4FCB1", "#CDC5FC", "#FFC2C4", "#F2D140", "#BCC6C8"][:number_of_colors]
     node_colors = []
@@ -419,7 +379,7 @@ def visualize_communities(graph, communities):
     node_colors = create_community_node_colors(graph, communities)
     modularity = round(nx.community.modularity(graph, communities), 6)
     title = f"Community Visualization of {len(communities)} communities with modularity of {modularity}"
-    pos = nx.spring_layout(graph, k=1, iterations=100)
+    pos = nx.spring_layout(graph, k=0.5, iterations=100)
 
     plt.title(title)
     nx.draw(
@@ -434,10 +394,7 @@ def visualize_communities(graph, communities):
     )
 
 
-def keyword_network(request):
-    query = request.GET.get("q", "")
-    patents = search(query)
-
+def keyword_network(query, patents):
     if not patents:
         return JsonResponse({"error": "No patents found"})
     else:
@@ -449,7 +406,7 @@ def keyword_network(request):
         # print("Detected communities:", communities)
 
         # 为可视化设置画布和图像保存路径
-        plt.figure(figsize=(20, 15))
+        plt.figure(figsize=(30, 15))
         file_name = f"network_{query}.png"
         image_path = os.path.join(
             settings.BASE_DIR, "patent_api", "static", "images", file_name
@@ -457,13 +414,21 @@ def keyword_network(request):
 
         # 绘制网络图并保存
         visualize_communities(G, communities)
+        # img_data = BytesIO()
+        # plt.savefig(img_data, format='png')
         plt.savefig(image_path)
         plt.close()
+        # img_data.seek(0)  # 移动到数据的开始位置
+        # img_base64 = base64.b64encode(img_data.read()).decode('utf-8')
 
         # 返回图像路径
         image_url = "/static/images/" + file_name
-        return JsonResponse({"image_url": image_url})
+        return image_url
 
 
 def word_network_view(request):
-    return render(request, "word_network.html")
+    query = request.GET.get("q", "")
+    patents = search(query)
+
+    image_url = keyword_network(query, patents)
+    return render(request, "word_network.html", {"image_url": image_url})
