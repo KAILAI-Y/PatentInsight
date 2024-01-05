@@ -407,28 +407,22 @@ def keyword_network(query, patents):
 
         # 为可视化设置画布和图像保存路径
         plt.figure(figsize=(30, 15))
-        file_name = f"network_{query}.png"
-        image_path = os.path.join(
-            settings.BASE_DIR, "patent_api", "static", "images", file_name
-        )
 
         # 绘制网络图并保存
         visualize_communities(G, communities)
-        # img_data = BytesIO()
-        # plt.savefig(img_data, format='png')
-        plt.savefig(image_path)
+        img_data = BytesIO()
+        plt.savefig(img_data, format="png")
         plt.close()
-        # img_data.seek(0)  # 移动到数据的开始位置
-        # img_base64 = base64.b64encode(img_data.read()).decode('utf-8')
+        img_data.seek(0)  # 移动到数据的开始位置
+        img_base64 = base64.b64encode(img_data.read()).decode("utf-8")
 
-        # 返回图像路径
-        image_url = "/static/images/" + file_name
-        return image_url
+        return img_base64
 
 
 def word_network_view(request):
     query = request.GET.get("q", "")
     patents = search(query)
 
-    image_url = keyword_network(query, patents)
-    return render(request, "word_network.html", {"image_url": image_url})
+    img_base64 = keyword_network(query, patents)
+    # print(img_base64)
+    return render(request, "word_network.html", {"img_base64": img_base64})
