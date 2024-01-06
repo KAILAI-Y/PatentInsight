@@ -24,7 +24,9 @@ This project is built using the following technologies and frameworks:
 - **Backend**: Django (Python) - for creating robust server-side applications and APIs.
 - **Database**: MySQL - for storing patent data and user information.
 - **Frontend**: HTML, CSS, JavaScript - for building interactive user interfaces.
-- **Data Visualization**: ECharts, wordCloud - provides rich options for data visualization.
+- **Data Visualization**: ECharts, wordCloud, and NetworkX - provides rich options for data visualization.
 - **AI and NLP**:
   - GPT-4-Vision - for generating AI-enhanced insights and data interpretation.
   - Jieba - for Chinese text segmentation and keyword extraction.
+  <!-- - **Network Analysis**:
+  - NetworkX - used for constructing and analyzing complex networks, enabling the detection of communities and visualization of their relationships. -->

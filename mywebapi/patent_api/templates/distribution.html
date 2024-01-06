@@ -135,29 +135,6 @@
       const title2 = document.getElementById('title2').innerText;
       localStorage.setItem('titleText2', title2);
       saveChartData('distributionBarChart', dist_bar);
-
-      {% comment %} document.addEventListener('DOMContentLoaded', function() {
-        var searchKeyword = "{{ request.GET.q }}";
-        document.getElementById('conclusion-analyze-button').addEventListener('click', function() {
-
-          if (!socket) {
-              console.error("WebSocket not defined");
-              return;
-          }
-
-          if (socket.readyState === WebSocket.OPEN) {
-            var distributionLineChartData = localStorage.getItem('distributionLineChart');
-            var distributionBarChartData = localStorage.getItem('distributionBarChart');
-            var base64Images = [distributionLineChartData, distributionBarChartData].filter(Boolean);
-            socket.send(JSON.stringify({
-              searchKeyword: searchKeyword,
-              base64Images: base64Images
-            }));
-          }else {
-            console.error("WebSocket not build");
-          }
-        });
-      }); {% endcomment %}
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
