@@ -1,10 +1,17 @@
 var socket
 
-function initializeWebSocket() {
+function initializeWebSocket(callback) {
+  console.log('Initializing WebSocket...')
   socket = new WebSocket('ws://' + window.location.host + '/ws/gpt/')
 
   socket.onopen = function (e) {
     console.log('WebSocket 连接成功')
+    console.log('正在调用回调函数...')
+    if (callback && typeof callback === 'function') {
+      callback() // 确保这里调用了回调函数
+    } else {
+      console.error('回调函数无效或未定义')
+    }
   }
 
   socket.onmessage = function (e) {

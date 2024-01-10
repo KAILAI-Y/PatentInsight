@@ -30,6 +30,7 @@ import csv
 import json
 from openai import OpenAI
 from .models import Patent
+from .models import UserSearch
 
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
@@ -39,7 +40,9 @@ def index(request):
 
 
 def search(query):
+    temp_user_id = "001"
     if query:
+        # generate_all_data_for_query(query)
         return Patent.objects.filter(title__icontains=query)
     else:
         return Patent.objects.none()
