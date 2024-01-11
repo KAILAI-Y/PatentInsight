@@ -17,29 +17,39 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from . import views
+from .views import (
+    search_list_views,
+    keyword_networkx_views,
+    generate_pdf_views,
+    graph_views,
+)
 
 urlpatterns = [
-    path("", views.index, name="search"),
-    path("result/", views.patent_list, name="patent_list"),
-    path("download_csv/", views.download_csv, name="download_csv"),
+    path("", search_list_views.index, name="search"),
+    path("result/", search_list_views.patent_list, name="patent_list"),
+    path("download_csv/", search_list_views.download_csv, name="download_csv"),
     path(
         "distribution/",
-        views.year_distribution,
+        graph_views.year_distribution,
         name="year_distribution",
     ),
     path(
         "innovation/",
-        views.province_innovation,
+        graph_views.province_innovation,
         name="province_innovation",
     ),
     path(
         "network/",
-        views.network_view,
+        graph_views.network_view,
         name="network_view",
     ),
-    path("generate_pdf/", views.generate_pdf, name="generate_pdf"),
-    path("wordcloud/", views.generate_wordcloud_view, name="generate_wordcloud_view"),
-    path("word-network/", views.word_network_view, name="word_network"),
-    # path("gpt_request/", views.gpt_request, name="gpt_request"),
+    path(
+        "wordcloud/",
+        graph_views.generate_wordcloud_view,
+        name="generate_wordcloud_view",
+    ),
+    path(
+        "word-network/", keyword_networkx_views.word_network_view, name="word_network"
+    ),
+    path("generate_pdf/", generate_pdf_views.generate_pdf, name="generate_pdf"),
 ]

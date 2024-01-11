@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
   initializeWebSocket(function () {
     console.log('WebSocket 连接成功，自动执行网络分析')
     document.getElementById('loading').style.display = 'flex'
-    performNetworkAnalysis()
+    // performNetworkAnalysis()
   })
 
   document

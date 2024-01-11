@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
   initializeWebSocket(function () {
     console.log('WebSocket 连接成功，自动执行分析')
     document.getElementById('loading').style.display = 'flex'
-    performInnovationAnalysis()
+    // performInnovationAnalysis()
   })
 
   document

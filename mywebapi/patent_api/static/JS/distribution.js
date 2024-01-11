@@ -1,7 +1,7 @@
 import { initializeWebSocket, sendMessage } from './gpt-websocket.js'
 
 // 定义一个函数来处理分析逻辑
-function performAnalysis() {
+function performDistributionAnalysis() {
   var searchKeyword = '{{ request.GET.q }}'
   var distributionLineChartData = localStorage.getItem('distributionLineChart')
   var distributionBarChartData = localStorage.getItem('distributionBarChart')
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // WebSocket连接成功后的回调，执行分析逻辑
     console.log('WebSocket 连接成功，自动执行分析')
     document.getElementById('loading').style.display = 'flex'
-    performAnalysis()
+    // performDistributionAnalysis()
   })
 
   // 绑定按钮点击事件到相同的分析逻辑
@@ -27,6 +27,6 @@ document.addEventListener('DOMContentLoaded', function () {
     .getElementById('conclusion-analyze-button')
     .addEventListener('click', function () {
       document.getElementById('loading').style.display = 'flex'
-      performAnalysis()
+      performDistributionAnalysis()
     })
 })

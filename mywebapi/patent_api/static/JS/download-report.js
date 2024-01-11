@@ -38,35 +38,6 @@ function getChartData() {
   }
 }
 
-// function fetchGPTConclusion(searchKeyword, base64Images) {
-//   fetch('/gpt_request/', {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//     body: JSON.stringify({
-//       text: `以下是关于搜索词“${searchKeyword}”在专利集合中的搜索结果，以下图片可能涉及这个专利的1.年度分布，2.领域创新主体计量/分布，3.领域合作网络及测度中任何一种图。作为一名数据分析师，请根据获得的图的类型描述图中的具体信息并进行分析， 比如峰谷值。字数控制在50字左右。`,
-//       base64_images: base64Images,
-//     }),
-//   })
-//     .then((response) => {
-//       if (!response.ok) {
-//         throw new Error('Network response was not ok')
-//       }
-//       return response.json()
-//     })
-//     .then((data) => {
-//       // 在这里处理 GPT-4 返回的结论
-//       document.getElementById('write-area').innerText = data.response
-//       console.log(data.response) // 显示 GPT-4 返回的文本
-//     })
-//     .catch((error) => {
-//       console.error('Error:', error)
-//       document.getElementById('write-area').innerText =
-//         'Error generating conclusion.'
-//     })
-// }
-
 function saveChartData(chartId, chartInstance) {
   chartInstance.on('finished', function () {
     var imageData = chartInstance.getDataURL({
