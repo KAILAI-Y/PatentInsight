@@ -16,8 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib.auth.views import LogoutView
 
 from .views import (
+    index_views,
     search_list_views,
     keyword_networkx_views,
     generate_pdf_views,
@@ -25,7 +27,8 @@ from .views import (
 )
 
 urlpatterns = [
-    path("", search_list_views.index, name="search"),
+    path("", index_views.index, name="index"),
+    path("logout/", index_views.logout_view, name="logout"),
     path("result/", search_list_views.patent_list, name="patent_list"),
     path("download_csv/", search_list_views.download_csv, name="download_csv"),
     path(

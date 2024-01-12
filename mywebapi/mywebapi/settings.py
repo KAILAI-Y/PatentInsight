@@ -13,6 +13,12 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from django.contrib.messages import constants as messages
+
+MESSAGE_TAGS = {
+    messages.ERROR: "alert-danger",
+    messages.SUCCESS: "alert-success",
+}
 
 load_dotenv()
 

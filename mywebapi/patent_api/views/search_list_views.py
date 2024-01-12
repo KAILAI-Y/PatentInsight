@@ -6,10 +6,6 @@ import csv
 from ..models import Patent
 
 
-def index(request):
-    return render(request, "index.html")
-
-
 def search(query):
     if query:
         return Patent.objects.filter(title__icontains=query)
