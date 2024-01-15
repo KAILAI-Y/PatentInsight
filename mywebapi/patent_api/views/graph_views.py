@@ -172,16 +172,15 @@ def get_top_keywords(patents, topK=100):
 def generate_wordcloud_view(request):
     query = request.GET.get("q", "")
     patents = search(query)
-
     user = request.user
 
-    user_search = UserSearch.objects.filter(user=user, search_word=query).first()
+    user_search, created = UserSearch.objects.get_or_create(
+        user=user, search_word=query
+    )
 
     if user_search and user_search.wordcloud_base64:
         wordcloud_image_base64 = user_search.wordcloud_base64
     else:
-        user_search = UserSearch(user=user, search_word=query)
-
         if patents.exists():
             top_keywords = get_top_keywords(patents, 100)
 

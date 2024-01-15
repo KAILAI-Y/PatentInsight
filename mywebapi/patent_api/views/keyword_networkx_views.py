@@ -158,12 +158,13 @@ def word_network_view(request):
 
     user = request.user
 
-    user_search = UserSearch.objects.filter(user=user, search_word=query).first()
+    user_search, created = UserSearch.objects.get_or_create(
+        user=user, search_word=query
+    )
 
     if user_search and user_search.word_network_base64:
         img_base64 = user_search.word_network_base64
     else:
-        user_search = UserSearch(user=user, search_word=query)
         img_base64 = keyword_network(patents)
 
     user_search.word_network_base64 = img_base64
