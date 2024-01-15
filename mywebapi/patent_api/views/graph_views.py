@@ -173,32 +173,37 @@ def generate_wordcloud_view(request):
     query = request.GET.get("q", "")
     patents = search(query)
 
-    if patents.exists():
-        top_keywords = get_top_keywords(patents, 100)
-
-        # 获取字体路径
-        font_path = os.path.join(
-            settings.BASE_DIR, "patent_api", "static", "font", "SimSun.ttf"
-        )
-
-        # 生成词云图像的 Base64 编码
-        wordcloud_image_base64 = generate_wordcloud_from_keywords(
-            top_keywords, font_path
-        )
-    else:
-        wordcloud_image_base64 = None
-
     user = request.user
 
     user_search = UserSearch.objects.filter(user=user, search_word=query).first()
 
-    if not user_search:
+    if user_search and user_search.wordcloud_base64:
+        wordcloud_image_base64 = user_search.wordcloud_base64
+    else:
         user_search = UserSearch(user=user, search_word=query)
 
-    user_search.wordcloud_base64 = wordcloud_image_base64
+        if patents.exists():
+            top_keywords = get_top_keywords(patents, 100)
 
+            # 获取字体路径
+            font_path = os.path.join(
+                settings.BASE_DIR, "patent_api", "static", "font", "SimSun.ttf"
+            )
+
+            # 生成词云图像的 Base64 编码
+            wordcloud_image_base64 = generate_wordcloud_from_keywords(
+                top_keywords, font_path
+            )
+        else:
+            wordcloud_image_base64 = None
+
+    user_search.wordcloud_base64 = wordcloud_image_base64
     user_search.save()
 
     return render(
-        request, "wordcloud.html", {"wordcloud_image_base64": wordcloud_image_base64}
+        request,
+        "wordcloud.html",
+        {
+            "wordcloud_image_base64": wordcloud_image_base64,
+        },
     )

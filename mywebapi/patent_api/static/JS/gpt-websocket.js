@@ -17,8 +17,8 @@ function initializeWebSocket(callback) {
   socket.onmessage = function (e) {
     var data = JSON.parse(e.data)
     var message = data.message
-    document.getElementById('write-area').innerHTML += message
-    // typeWriter(message, 'write-area', 0)
+    // document.getElementById('write-area').innerHTML += message
+    typeWriter(message, 'write-area', 0)
     document.getElementById('loading').style.display = 'none'
     // console.log(message)
   }
@@ -43,7 +43,7 @@ function sendMessage(searchKeyword, base64Images, analysisType) {
   )
 }
 
-function typeWriter(text, elementId, index, speed = 200) {
+function typeWriter(text, elementId, index, speed = 50) {
   if (index < text.length) {
     document.getElementById(elementId).innerHTML += text.charAt(index)
     index++

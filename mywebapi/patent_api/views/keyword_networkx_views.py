@@ -155,17 +155,18 @@ def keyword_network(patents):
 def word_network_view(request):
     query = request.GET.get("q", "")
     patents = search(query)
-    img_base64 = keyword_network(patents)
 
     user = request.user
 
     user_search = UserSearch.objects.filter(user=user, search_word=query).first()
 
-    if not user_search:
+    if user_search and user_search.word_network_base64:
+        img_base64 = user_search.word_network_base64
+    else:
         user_search = UserSearch(user=user, search_word=query)
+        img_base64 = keyword_network(patents)
 
     user_search.word_network_base64 = img_base64
-
     user_search.save()
 
     return render(request, "word_network.html", {"img_base64": img_base64})
