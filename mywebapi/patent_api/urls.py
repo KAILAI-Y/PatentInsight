@@ -24,6 +24,7 @@ from .views import (
     keyword_networkx_views,
     generate_pdf_views,
     graph_views,
+    save_notes_views,
 )
 
 urlpatterns = [
@@ -55,4 +56,5 @@ urlpatterns = [
         "word-network/", keyword_networkx_views.word_network_view, name="word_network"
     ),
     path("generate_pdf/", generate_pdf_views.generate_pdf, name="generate_pdf"),
+    path("save-notes/", save_notes_views.save_notes, name="save_notes"),
 ]
