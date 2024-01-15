@@ -62,14 +62,7 @@
             src="data:image/png;base64,{{ wordcloud_image_base64 }}"
             alt="Word Cloud Image"
           />
-          <script>
-            const title6 = document.getElementById('title6').innerText
-            localStorage.setItem('titleText6', title6)
-            localStorage.setItem(
-              'wordcloud',
-              'data:image/png;base64,{{ wordcloud_image_base64 }}'
-            )
-          </script>
+
           {% else %}
           <p>No word cloud available for this query.</p>
           {% endif %}
@@ -77,6 +70,16 @@
       </div>
     </div>
 
+    {% comment %}
+    <script>
+      const title6 = document.getElementById('title6').innerText
+      localStorage.setItem('titleText6', title6)
+      localStorage.setItem(
+        'wordcloud',
+        'data:image/png;base64,{{ wordcloud_image_base64 }}'
+      )
+    </script>
+    {% endcomment %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

@@ -1,15 +1,20 @@
 import { initializeWebSocket, sendMessage } from './gpt-websocket.js'
 
+function getSearchKeywordFromURL() {
+  var params = new URLSearchParams(window.location.search)
+  return params.get('q')
+}
+
 // 定义一个函数来处理分析逻辑
 function performInnovationAnalysis() {
-  var searchKeyword = '{{ request.GET.q }}'
+  var searchKeyword = getSearchKeywordFromURL()
   var innovationBarChartData = localStorage.getItem('innovationBarChart')
   var innovationMapChartData = localStorage.getItem('innovationMapChart')
   var base64Images = [innovationBarChartData, innovationMapChartData].filter(
     Boolean
   )
 
-  sendMessage(searchKeyword, base64Images)
+  sendMessage(searchKeyword, base64Images, 'innovation')
 }
 
 document.addEventListener('DOMContentLoaded', function () {

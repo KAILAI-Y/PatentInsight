@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 import csv
 
-from ..models import Patent
+from ..models import Patent, UserSearch
 
 
 def search(query):
@@ -21,12 +21,15 @@ def patent_list(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
+    UserSearch.objects.create(user=request.user, search_word=query)
+
     return render(
         request,
         "result.html",
         {
             "page_obj": page_obj,
             "total_count": paginator.count,
+            "query": query,
         },
     )
 

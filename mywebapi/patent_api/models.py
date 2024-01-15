@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Patent(models.Model):
@@ -16,10 +17,13 @@ class Patent(models.Model):
 
 
 class UserSearch(models.Model):
-    user_id = models.IntegerField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     search_word = models.CharField(max_length=255)
-    distribution_conclusion = models.TextField()
-    innovation_conclusion = models.TextField()
-    network_conclusion = models.TextField()
-    wordcloud_base64 = models.TextField()
-    word_network_base64 = models.TextField()
+    distribution_conclusion = models.TextField(blank=True, null=True)
+    innovation_conclusion = models.TextField(blank=True, null=True)
+    network_conclusion = models.TextField(blank=True, null=True)
+    wordcloud_base64 = models.TextField(blank=True, null=True)
+    word_network_base64 = models.TextField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ["user", "search_word"]

@@ -28,7 +28,7 @@ function initializeWebSocket(callback) {
   }
 }
 
-function sendMessage(searchKeyword, base64Images) {
+function sendMessage(searchKeyword, base64Images, analysisType) {
   if (!socket || socket.readyState !== WebSocket.OPEN) {
     console.error('WebSocket is not connected')
     return
@@ -38,6 +38,7 @@ function sendMessage(searchKeyword, base64Images) {
     JSON.stringify({
       searchKeyword: searchKeyword,
       base64Images: base64Images,
+      analysisType: analysisType,
     })
   )
 }

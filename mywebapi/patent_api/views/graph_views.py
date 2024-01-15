@@ -9,7 +9,7 @@ from io import BytesIO
 import base64
 import os
 
-from ..models import Patent
+from ..models import Patent, UserSearch
 
 
 def search(query):
@@ -187,6 +187,17 @@ def generate_wordcloud_view(request):
         )
     else:
         wordcloud_image_base64 = None
+
+    user = request.user
+
+    user_search = UserSearch.objects.filter(user=user, search_word=query).first()
+
+    if not user_search:
+        user_search = UserSearch(user=user, search_word=query)
+
+    user_search.wordcloud_base64 = wordcloud_image_base64
+
+    user_search.save()
 
     return render(
         request, "wordcloud.html", {"wordcloud_image_base64": wordcloud_image_base64}

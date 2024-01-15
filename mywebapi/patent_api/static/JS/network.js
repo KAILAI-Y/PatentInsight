@@ -1,12 +1,16 @@
 import { initializeWebSocket, sendMessage } from './gpt-websocket.js'
 
+function getSearchKeywordFromURL() {
+  var params = new URLSearchParams(window.location.search)
+  return params.get('q')
+}
+
 function performNetworkAnalysis() {
-  var searchKeyword = '{{ request.GET.q }}'
+  var searchKeyword = getSearchKeywordFromURL()
   var networkChartData = localStorage.getItem('networkChart')
   var base64Images = [networkChartData].filter(Boolean)
 
-  console.log(base64Images)
-  sendMessage(searchKeyword, base64Images)
+  sendMessage(searchKeyword, base64Images, 'network')
 }
 
 document.addEventListener('DOMContentLoaded', function () {

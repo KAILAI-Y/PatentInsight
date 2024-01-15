@@ -11,7 +11,7 @@ import matplotlib
 import base64
 import heapq
 
-from ..models import Patent
+from ..models import Patent, UserSearch
 
 
 def search(query):
@@ -155,7 +155,17 @@ def keyword_network(patents):
 def word_network_view(request):
     query = request.GET.get("q", "")
     patents = search(query)
-
     img_base64 = keyword_network(patents)
+
+    user = request.user
+
+    user_search = UserSearch.objects.filter(user=user, search_word=query).first()
+
+    if not user_search:
+        user_search = UserSearch(user=user, search_word=query)
+
+    user_search.word_network_base64 = img_base64
+
+    user_search.save()
 
     return render(request, "word_network.html", {"img_base64": img_base64})

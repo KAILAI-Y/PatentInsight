@@ -1,8 +1,13 @@
 import { initializeWebSocket, sendMessage } from './gpt-websocket.js'
 
+function getSearchKeywordFromURL() {
+  var params = new URLSearchParams(window.location.search)
+  return params.get('q')
+}
+
 // 定义一个函数来处理分析逻辑
 function performDistributionAnalysis() {
-  var searchKeyword = '{{ request.GET.q }}'
+  var searchKeyword = getSearchKeywordFromURL()
   var distributionLineChartData = localStorage.getItem('distributionLineChart')
   var distributionBarChartData = localStorage.getItem('distributionBarChart')
   var base64Images = [
@@ -10,7 +15,7 @@ function performDistributionAnalysis() {
     distributionBarChartData,
   ].filter(Boolean)
 
-  sendMessage(searchKeyword, base64Images)
+  sendMessage(searchKeyword, base64Images, 'distribution')
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -19,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // WebSocket连接成功后的回调，执行分析逻辑
     console.log('WebSocket 连接成功，自动执行分析')
     document.getElementById('loading').style.display = 'flex'
-    // performDistributionAnalysis()
+    performDistributionAnalysis()
   })
 
   // 绑定按钮点击事件到相同的分析逻辑
