@@ -21,7 +21,7 @@ def patent_list(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    UserSearch.objects.create(user=request.user, search_word=query)
+    UserSearch.objects.get_or_create(user=request.user, search_word=query)
 
     return render(
         request,

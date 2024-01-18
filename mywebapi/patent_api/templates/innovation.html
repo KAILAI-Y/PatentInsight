@@ -18,9 +18,10 @@
     <link href="{% static 'CSS/styles.css' %}" rel="stylesheet" />
   </head>
   <body>
-    <script src="{% static 'JS/download-report.js' %}"></script>
+    <script src="{% static 'JS/download_report.js' %}"></script>
     <script type="module" src="{% static 'JS/innovation.js' %}"></script>
     <script src="{% static 'JS/save_notes.js' %}"></script>
+    <script src="{% static 'JS/save_charts.js' %}"></script>
     <div class="container mt-3">
       <div class="navbar-container">
         <ul class="nav nav-tabs">
@@ -50,7 +51,7 @@
             >
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/word-network?q={{ request.GET.q }}"
+            <a class="nav-link" href="/word_network?q={{ request.GET.q }}"
               >主题词关系图</a
             >
           </li>
@@ -176,13 +177,6 @@
       const title4 = document.getElementById('title4').innerText;
       localStorage.setItem('titleText4', title4);
       saveChartData('innovationMapChart', inno_map);
-
-      {% comment %} setTimeout(function() {
-        html2canvas(document.getElementById('innovation_map')).then(canvas => {
-          var base64Image = canvas.toDataURL('image/png');
-          localStorage.setItem('innovationMapChart', base64Image);
-        });
-      }, 15000); {% endcomment %}
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>

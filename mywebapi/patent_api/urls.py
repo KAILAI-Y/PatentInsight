@@ -25,6 +25,7 @@ from .views import (
     generate_pdf_views,
     graph_views,
     save_notes_views,
+    save_charts_views,
 )
 
 urlpatterns = [
@@ -53,8 +54,9 @@ urlpatterns = [
         name="generate_wordcloud_view",
     ),
     path(
-        "word-network/", keyword_networkx_views.word_network_view, name="word_network"
+        "word_network/", keyword_networkx_views.word_network_view, name="word_network"
     ),
     path("generate_pdf/", generate_pdf_views.generate_pdf, name="generate_pdf"),
-    path("save-notes/", save_notes_views.save_notes, name="save_notes"),
+    path("save_notes/", save_notes_views.save_notes, name="save_notes"),
+    path("save_charts/", save_charts_views.save_chart_data, name="save_chart_data"),
 ]

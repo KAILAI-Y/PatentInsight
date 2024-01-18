@@ -3,7 +3,7 @@ function saveUserNotes() {
   var searchKeyword = getSearchKeyword()
   var analysisType = getAnalysisType()
 
-  fetch('/save-notes/', {
+  fetch('/save_notes/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

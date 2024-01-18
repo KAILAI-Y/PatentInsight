@@ -16,8 +16,6 @@ function editConclusion() {
   }
 }
 
-// function saveUserNotes() {}
-
 function getChartData() {
   return {
     distributionLineChart: localStorage.getItem('distributionLineChart'),
@@ -36,18 +34,6 @@ function getChartData() {
     titleText6: localStorage.getItem('titleText6'),
     wordcloudImage: localStorage.getItem('wordcloud'),
   }
-}
-
-function saveChartData(chartId, chartInstance) {
-  chartInstance.on('finished', function () {
-    var imageData = chartInstance.getDataURL({
-      type: 'png',
-      pixelRatio: 2,
-      backgroundColor: '#fff',
-    })
-
-    localStorage.setItem(chartId, imageData)
-  })
 }
 
 function downloadReport() {

@@ -12,9 +12,10 @@
     <script src="{% static 'JS/html2canvas.min.js' %}"></script>
   </head>
   <body>
-    <script src="{% static 'JS/download-report.js' %}"></script>
+    <script src="{% static 'JS/download_report.js' %}"></script>
     <script type="module" src="{% static 'JS/network.js' %}"></script>
     <script src="{% static 'JS/save_notes.js' %}"></script>
+    <script src="{% static 'JS/save_charts.js' %}"></script>
     <div class="container mt-3">
       <div class="navbar-container">
         <ul class="nav nav-tabs">
@@ -44,7 +45,7 @@
             >
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/word-network?q={{ request.GET.q }}"
+            <a class="nav-link" href="/word_network?q={{ request.GET.q }}"
               >主题词关系图</a
             >
           </li>
@@ -123,6 +124,7 @@
       html2canvas(document.getElementById('networkChart')).then(canvas => {
         var base64Image = canvas.toDataURL('image/png');
         localStorage.setItem('networkChart', base64Image);
+        sendChartBase64ToBackend('networkChart', base64Image)
       });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
