@@ -1,3 +1,21 @@
+function editConclusion() {
+  const conclusion = document.querySelector('.conclusion')
+  const comments = document.querySelector('#comments')
+  const writeArea = document.querySelector('#write-area')
+  const saveButton = document.querySelector('#save-button')
+
+  writeArea.style.minHeight = '100px'
+  conclusion.onclick = function (event) {
+    comments.style.display = 'none'
+    event.stopPropagation()
+    saveButton.style.display = 'block'
+  }
+
+  document.onclick = function () {
+    saveButton.style.display = 'none'
+  }
+}
+
 function saveUserNotes() {
   var content = document.getElementById('write-area').innerHTML
   var searchKeyword = getSearchKeyword()

@@ -167,6 +167,9 @@ def word_network_view(request):
     else:
         img_base64 = keyword_network(patents)
 
+        if not img_base64.startswith("data:image/png;base64,"):
+            img_base64 = "data:image/png;base64," + img_base64
+
     user_search.word_network_base64 = img_base64
     user_search.save()
 

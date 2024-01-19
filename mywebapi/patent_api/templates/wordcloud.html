@@ -58,10 +58,7 @@
           <br />
           <h4 id="title6">词云图</h4>
           {% if wordcloud_image_base64 %}
-          <img
-            src="data:image/png;base64,{{ wordcloud_image_base64 }}"
-            alt="Word Cloud Image"
-          />
+          <img src="{{ wordcloud_image_base64 }}" alt="Word Cloud Image" />
 
           {% else %}
           <p>No word cloud available for this query.</p>

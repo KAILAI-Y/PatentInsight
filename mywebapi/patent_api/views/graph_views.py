@@ -193,6 +193,12 @@ def generate_wordcloud_view(request):
             wordcloud_image_base64 = generate_wordcloud_from_keywords(
                 top_keywords, font_path
             )
+
+            if not wordcloud_image_base64.startswith("data:image/png;base64,"):
+                wordcloud_image_base64 = (
+                    "data:image/png;base64," + wordcloud_image_base64
+                )
+
         else:
             wordcloud_image_base64 = None
 
